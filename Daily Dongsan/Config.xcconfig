@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  Daily Dongsan
+//
+//  Created by 최지한 on 9/15/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+apiKey = 3a8dc7e1bdb74c68abe6fb1d19131ecc
