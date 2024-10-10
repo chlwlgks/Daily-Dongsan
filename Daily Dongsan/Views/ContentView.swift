@@ -14,21 +14,20 @@ struct ContentView: View {
             Tab("홈", systemImage: "house") {
                 HomeView()
             }
-            Tab("식단", systemImage: "fork.knife") {
+            Tab("식단", systemImage: "calendar") {
                 MealsView()
             }
             Tab("학생증", systemImage: "person.text.rectangle") {
-                Text("학생증")
+                BarcodeView()
             }
             Tab("설정", systemImage: "gearshape") {
                 Text("설정")
             }
         }
-        .tabViewStyle(.tabBarOnly) // sidebar가 필요할까??
+        .tabViewStyle(.sidebarAdaptable)
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(MealService())
 }

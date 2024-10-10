@@ -27,7 +27,6 @@ class MealService: ObservableObject {
     private let apiKey = Bundle.main.infoDictionary?["API Key"]
     
     func fetchMeals(date: Date){
-        
         guard let apiKey else {
             error(message: "API Key 없음")
             return

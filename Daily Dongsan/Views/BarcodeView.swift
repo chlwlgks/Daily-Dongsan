@@ -21,15 +21,36 @@ struct BarcodeView: View {
         "*": "100101101101"
     ]
     
-    private var input = "DS00773"
+    private let input = "DS00773"
     
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(generateCode39(input)), id: \.self) { bar in
-                Rectangle()
-                    .fill(bar == "1" ? Color.black : Color.white)
-                    .frame(width: 3, height: 100)
+        NavigationStack {
+            GeometryReader { geometry in
+                let barwidth = geometry.size.width / 130
+                let barheight = barwidth * 35
+                
+                VStack {
+                    HStack(spacing: 0) {
+                        ForEach(Array(generateCode39(input)), id: \.self) { bar in
+                            Rectangle()
+                                .fill(bar == "1" ? Color.black : Color.white)
+                                .frame(width: barwidth, height: barheight)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white)
+                    )
+                    
+                    Text(input)
+                    Text("\(geometry.size.width)")
+                    Text("\(geometry.size.height)")
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .padding()
+            .navigationTitle("학생증")
         }
     }
     

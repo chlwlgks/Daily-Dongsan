@@ -22,6 +22,7 @@ struct HomeView: View {
                 }
             }
             .padding(.horizontal)
+            .navigationTitle("홈")
             .onAppear {
                 mealService.fetchMeals(date: Date())
                 
@@ -35,22 +36,7 @@ struct HomeView: View {
         let errorMessage: String?
         
         var body: some View {
-            Group {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("안산동산고등학교")
-                            .font(.footnote)
-                            .bold()
-                            .foregroundStyle(.gray)
-                        Text("홈")
-                            .font(.largeTitle)
-                            .bold()
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.bottom)
-                
+            VStack {
                 if let errorMessage {
                     Spacer()
                     Text(errorMessage)
@@ -93,44 +79,30 @@ struct HomeView: View {
         let errorMessage: String?
         
         var body: some View {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("안산동산고등학교")
-                        .font(.footnote)
+            VStack {
+                if let errorMessage {
+                    Spacer()
+                    Text(errorMessage)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                } else if let meals {
+                    Text(currentDate())
+                        .font(.title3)
                         .bold()
-                        .foregroundStyle(.gray)
-                    Text("홈")
-                        .font(.largeTitle)
-                        .bold()
-                }
-                
-                Spacer()
-            }
-            .padding(.vertical)
-            .padding(.top)
-            
-            if let errorMessage {
-                Spacer()
-                Text(errorMessage)
-                    .multilineTextAlignment(.center)
-                Spacer()
-            } else if let meals {
-                Text(currentDate())
-                    .font(.title3)
-                    .bold()
-                
-                List(meals) { meal in
-                    Section {
-                        Text(meal.name)
-                    } header: {
-                        HStack {
-                            Text(meal.mealTime)
-                            Spacer()
-                            Text(meal.calorie)
+                    
+                    List(meals) { meal in
+                        Section {
+                            Text(meal.name)
+                        } header: {
+                            HStack {
+                                Text(meal.mealTime)
+                                Spacer()
+                                Text(meal.calorie)
+                            }
                         }
                     }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
             }
         }
     }

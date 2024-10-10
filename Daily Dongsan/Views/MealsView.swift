@@ -16,43 +16,32 @@ struct MealsView: View {
     
     var body: some View {
         NavigationStack {
-            if horizontalSizeClass == .regular {
-                RegularMealView(meals: mealService.meals, selectedDate: selectedDate, errorMessage: mealService.errorMessage)
-            } else {
-                CompactMealView(meals: mealService.meals, selectedDate: selectedDate, errorMessage: mealService.errorMessage)
+            Group {
+                if horizontalSizeClass == .regular {
+                    RegularMealView(meals: mealService.meals, selectedDate: $selectedDate, errorMessage: mealService.errorMessage)
+                } else {
+                    CompactMealView(meals: mealService.meals, selectedDate: $selectedDate, errorMessage: mealService.errorMessage)
+                        .navigationBarTitleDisplayMode(.inline)
+                }
             }
-        }
-        .listStyle(.plain)
-        .padding(.horizontal)
-        .onAppear {
-            mealService.fetchMeals(date: selectedDate)
-        }
-        .onChange(of: selectedDate) {
-            mealService.fetchMeals(date: selectedDate)
+            .listStyle(.plain)
+            .padding(.horizontal)
+            .navigationTitle("식단")
+            .onAppear {
+                mealService.fetchMeals(date: selectedDate)
+            }
+            .onChange(of: selectedDate) {
+                mealService.fetchMeals(date: selectedDate)
+            }
         }
     }
     
     private struct RegularMealView: View {
         let meals: [Meal]?
-        @State var selectedDate: Date
+        @Binding var selectedDate: Date
         let errorMessage: String?
         
         var body: some View {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("안산동산고등학교")
-                        .font(.footnote)
-                        .bold()
-                        .foregroundStyle(.gray)
-                    Text("식단")
-                        .font(.largeTitle)
-                        .bold()
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-            
             HStack(alignment: .top) {
                 VStack(spacing: 16) {
                     DatePicker("날짜", selection: $selectedDate, displayedComponents: .date)
@@ -105,43 +94,41 @@ struct MealsView: View {
     
     private struct CompactMealView: View {
         let meals: [Meal]?
-        @State var selectedDate: Date
+        @Binding var selectedDate: Date
         let errorMessage: String?
         
         var body: some View {
-            DatePicker("날짜", selection: $selectedDate, displayedComponents: .date)
-                .datePickerStyle(.graphical)
-            
-            if let errorMessage {
-                Spacer()
-                Text(errorMessage)
-                    .multilineTextAlignment(.center)
-                    .navigationTitle("식단")
-                    .navigationBarTitleDisplayMode(.inline)
-                Spacer()
-            } else if let meals {
-                var formattedDate: String {
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.locale = Locale(identifier: "ko_KR")
-                    dateFormatter.dateFormat = "MMMM d일 EEEE"
-                    return dateFormatter.string(from: selectedDate)
-                }
+            VStack {
+                DatePicker("날짜", selection: $selectedDate, displayedComponents: .date)
+                    .datePickerStyle(.graphical)
                 
-                VStack {
-                    List(meals) { meal in
-                        Section {
-                            Text(meal.name)
-                        } header: {
-                            HStack {
-                                Text(meal.mealTime)
-                                Spacer()
-                                Text(meal.calorie)
+                if let errorMessage {
+                    Spacer()
+                    Text(errorMessage)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                } else if let meals {
+                    var formattedDate: String {
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.locale = Locale(identifier: "ko_KR")
+                        dateFormatter.dateFormat = "MMMM d일 EEEE"
+                        return dateFormatter.string(from: selectedDate)
+                    }
+                    
+                    VStack {
+                        List(meals) { meal in
+                            Section {
+                                Text(meal.name)
+                            } header: {
+                                HStack {
+                                    Text(meal.mealTime)
+                                    Spacer()
+                                    Text(meal.calorie)
+                                }
                             }
                         }
                     }
                 }
-                .navigationTitle("\(formattedDate) 식단")
-                .navigationBarTitleDisplayMode(.inline)
             }
         }
     }
