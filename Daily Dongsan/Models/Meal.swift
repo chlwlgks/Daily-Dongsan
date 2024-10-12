@@ -7,6 +7,13 @@
 
 import Foundation
 
+struct Meal: Identifiable {
+    let id: String
+    let mealTime: String
+    let name: String
+    let calorie: String
+}
+
 struct Mealresponse: Decodable {
     var mealServiceDietInfo: [MealServiceDietInfo]
 }

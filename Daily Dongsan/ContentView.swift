@@ -20,9 +20,6 @@ struct ContentView: View {
             Tab("학생증", systemImage: "person.text.rectangle") {
                 BarcodeView()
             }
-            Tab("설정", systemImage: "gearshape") {
-                Text("설정")
-            }
         }
         .tabViewStyle(.sidebarAdaptable)
     }

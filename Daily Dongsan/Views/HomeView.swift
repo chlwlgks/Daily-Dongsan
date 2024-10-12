@@ -8,31 +8,57 @@
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
-    @EnvironmentObject var mealService: MealService
+    @State private var meals = [
+        Meal(id: "1", mealTime: "조식", name: "급식 정보가 없습니다.", calorie: ""),
+        Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""),
+        Meal(id: "3", mealTime: "석식", name: "급식 정보가 없습니다.", calorie: "")
+    ]
+    private let mealTimes: [String : String] = ["1" : "조식", "2" : "중식", "3" : "석식"]
+    
+    @State private var currentDate: String = ""
+    
+    @State private var errorMessage: String?
+    
+    private let apiKey = Bundle.main.infoDictionary?["API Key"]
+    
+    @State private var isShowingSettings: Bool = false
+    
+    @State var dkdrlah = 0
     
     var body: some View {
         NavigationStack {
-            Group {
+            VStack {
+                Text("\(dkdrlah)")
                 if horizontalSizeClass == .regular {
-                    RegularHome(meals: mealService.meals, currentDate: currentDate, errorMessage: mealService.errorMessage)
+                    RegularHomeView(meals: meals, currentDate: currentDate, errorMessage: errorMessage)
                 } else {
-                    CompactHome(meals: mealService.meals, currentDate: currentDate, errorMessage: mealService.errorMessage)
+                    CompactHomeView(meals: meals, currentDate: currentDate, errorMessage: errorMessage)
                 }
             }
             .padding(.horizontal)
-            .navigationTitle("홈")
             .onAppear {
-                mealService.fetchMeals(date: Date())
-                
+                currentDate = currentDateString()
+                fetchMeals(date: Date())
+            }
+            .navigationTitle("홈")
+            .toolbar {
+                Button {
+                    isShowingSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView()
             }
         }
     }
     
-    private struct RegularHome: View {
-        let meals: [Meal]?
-        let currentDate: () -> String
+    private struct RegularHomeView: View {
+        let meals: [Meal]
+        let currentDate: String
         let errorMessage: String?
         
         var body: some View {
@@ -42,8 +68,8 @@ struct HomeView: View {
                     Text(errorMessage)
                         .multilineTextAlignment(.center)
                     Spacer()
-                } else if let meals {
-                    Text(currentDate())
+                } else {
+                    Text(currentDate)
                         .font(.title3)
                         .bold()
                         .padding(.bottom)
@@ -73,9 +99,9 @@ struct HomeView: View {
         }
     }
     
-    private struct CompactHome: View {
-        let meals: [Meal]?
-        let currentDate: () -> String
+    private struct CompactHomeView: View {
+        let meals: [Meal]
+        let currentDate: String
         let errorMessage: String?
         
         var body: some View {
@@ -85,8 +111,8 @@ struct HomeView: View {
                     Text(errorMessage)
                         .multilineTextAlignment(.center)
                     Spacer()
-                } else if let meals {
-                    Text(currentDate())
+                } else {
+                    Text(currentDate)
                         .font(.title3)
                         .bold()
                     
@@ -107,15 +133,110 @@ struct HomeView: View {
         }
     }
     
-    private func currentDate() -> String {
+    private func currentDateString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "MMMM d일 EEEE"
         return dateFormatter.string(from: Date())
     }
+    
+    private func startMidnightTimer() {
+        let calendar = Calendar.current
+        let now = Date()
+        let nextMidnight = calendar.nextDate(after: now, matching: DateComponents(hour: 0), matchingPolicy: .nextTime) ?? now
+        
+        let timeInterval = nextMidnight.timeIntervalSince(now)
+        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
+            currentDate = currentDateString()
+            fetchMeals(date: Date())
+            startMidnightTimer()
+            dkdrlah += 1
+        }
+    }
+    
+    private func fetchMeals(date: Date) {
+        guard let apiKey else {
+            error("API Key가 존재하지 않습니다.")
+            return
+        }
+        
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "yyyyMMdd"
+        let currentDate = dateformatter.string(from: date)
+        
+        let url = "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(currentDate)"
+        guard let url = URL(string: url) else {
+            error("URL 생성에 실패했습니다.")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error {
+                self.error(error.localizedDescription)
+                return
+            }
+            
+            guard let data else {
+                self.error("데이터가 없습니다.")
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(Mealresponse.self, from: data)
+                
+                guard let rows = response.mealServiceDietInfo[1].row else {
+                    self.error("데이터가 없습니다.")
+                    return
+                }
+                
+                var fetchedMeals: [Meal] = []
+                
+                for mealTypeCode in ["1", "2", "3"] {
+                    guard let mealTypeName = self.mealTimes[mealTypeCode] else {
+                        self.error("데이터가 없습니다.")
+                        return
+                    }
+                    
+                    if let mealInfo = rows.first(where: { mealInfo in
+                        mealInfo.MMEAL_SC_CODE == mealTypeCode
+                    }) {
+                        let mealName = mealInfo.DDISH_NM.replacingOccurrences(of: "<br/>", with: "\n")
+                        let calorie = mealInfo.CAL_INFO
+                        
+                        fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: calorie))
+                    } else {
+                        fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: "급식 정보가 없습니다.", calorie: ""))
+                    }
+                }
+                
+                DispatchQueue.main.async {
+                    meals = fetchedMeals
+                    errorMessage = nil
+                }
+            } catch {
+                var tempMeals: [Meal] = []
+                
+                tempMeals.append(Meal(id: "1", mealTime: "조식", name: "급식 정보가 없습니다.", calorie: ""))
+                tempMeals.append(Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""))
+                tempMeals.append(Meal(id: "3", mealTime: "석식", name: "급식 정보가 없습니다.", calorie: ""))
+                
+                DispatchQueue.main.async {
+                    meals = tempMeals
+                    errorMessage = nil
+                }
+            }
+        }
+        .resume()
+    }
+    
+    private func error(_ message: String) {
+        DispatchQueue.main.async {
+            errorMessage = message
+        }
+    }
 }
+
 
 #Preview {
     HomeView()
-        .environmentObject(MealService())
 }
