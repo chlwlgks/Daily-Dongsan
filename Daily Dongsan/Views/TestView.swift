@@ -11,9 +11,20 @@ import FirebaseFirestore
 struct TestView: View {
     @State private var db: Firestore = Firestore.firestore()
     
+    @State var toggling = false
+    
     var body: some View {
-        VStack {
-            Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            Form {
+                Section("Title") {
+                    Toggle(isOn: $toggling) {
+                        Text("Toggly")
+                    }
+                    Button("Save changes") {
+                        print("Saved")
+                    }.disabled(!toggling)
+                }
+            }.navigationBarTitle(Text("Settings"))
         }
         .onAppear {
             setupFirestore()

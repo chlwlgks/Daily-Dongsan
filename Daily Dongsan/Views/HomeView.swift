@@ -23,7 +23,7 @@ struct HomeView: View {
     
     private let apiKey = Bundle.main.infoDictionary?["API Key"]
     
-    @State private var isShowingSettings: Bool = false
+    @State private var isShowingSettingsView: Bool = false
     
     @State var dkdrlah = 0
     
@@ -45,12 +45,12 @@ struct HomeView: View {
             .navigationTitle("홈")
             .toolbar {
                 Button {
-                    isShowingSettings = true
+                    isShowingSettingsView = true
                 } label: {
                     Image(systemName: "gearshape")
                 }
             }
-            .sheet(isPresented: $isShowingSettings) {
+            .sheet(isPresented: $isShowingSettingsView) {
                 SettingsView()
             }
         }

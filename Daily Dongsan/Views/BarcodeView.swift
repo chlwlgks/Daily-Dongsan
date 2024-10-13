@@ -11,7 +11,7 @@ import SwiftData
 struct BarcodeView: View {
     @State private var savedCode: String? = UserDefaults.standard.string(forKey: "savedCode")
     
-    @State private var isShowingBarcodeSetup: Bool = false
+    @State private var isShowingBarcodeSetupView: Bool = false
     
     private let code39Patterns: [Character: String] = [
         "0": "101001101101", "1": "110100101011", "2": "101100101011", "3": "110110010101",
@@ -35,7 +35,7 @@ struct BarcodeView: View {
                     
                     VStack {
                         HStack(spacing: 0) {
-                            ForEach(Array(generateCode39(savedCode)), id: \.self) { bar in
+                            ForEach(Array(generateCode39(input: savedCode)), id: \.self) { bar in
                                 Rectangle()
                                     .fill(bar == "1" ? Color.black : Color.white)
                                     .frame(width: barwidth, height: barheight)
@@ -55,7 +55,7 @@ struct BarcodeView: View {
                 .navigationTitle("학생증")
             } else {
                 Button {
-                    isShowingBarcodeSetup = true
+                    isShowingBarcodeSetupView = true
                 } label: {
                     Text("학생증 시작하기")
                         .font(.headline)
@@ -75,16 +75,16 @@ struct BarcodeView: View {
         .onAppear {
             if savedCode == nil {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
-                    isShowingBarcodeSetup = true
+                    isShowingBarcodeSetupView = true
                 }
             }
         }
-        .sheet(isPresented: $isShowingBarcodeSetup) {
-            BarcodeSetupView(isShowing: $isShowingBarcodeSetup, inputCode: $savedCode)
+        .sheet(isPresented: $isShowingBarcodeSetupView) {
+            BarcodeSetupView(isShowing: $isShowingBarcodeSetupView, inputCode: $savedCode)
         }
     }
     
-    private func generateCode39(_ input: String) -> String {
+    private func generateCode39(input: String) -> String {
         var code39 = code39Patterns["*"]! + "0"
         
         for character in input.uppercased() {
@@ -99,6 +99,8 @@ struct BarcodeView: View {
 }
 
 struct BarcodeSetupView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @Binding var isShowing: Bool
     @Binding var inputCode: String?
     
@@ -114,87 +116,95 @@ struct BarcodeSetupView: View {
     }
     
     var body: some View {
-        VStack {
-            Spacer()
-            
-            Text("학생증 시작하기")
-                .font(.largeTitle)
-                .bold()
-            
-            Spacer()
-            
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(spacing: 16) {
-                    Image(systemName: "person.text.rectangle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(.accent)
-                        .frame(width: 50, height: 50)
-                    Text("학생증의 프로필 사진 밑에 있는 7자리 코드를 적어주세요.")
-                }
-                HStack(spacing: 16) {
-                    Image(systemName: "person.slash.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(.accent)
-                        .frame(width: 50, height: 50)
-                    Text("학생증 코드는 한 번 등록하면 변경할 수 없습니다.")
-                }
-            }
-            .padding(.horizontal)
-            
-            Spacer()
-            Spacer()
-            
-            Group {
-                TextField("학생증 코드", text: $temporaryCode)
-                    .padding()
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .background {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray)
-                    }
-                    .autocorrectionDisabled()
-                    .onSubmit {
-                        validateCode()
-                    }
-                if !isValid {
-                    Text("학생증 코드는 7글자여야 합니다.")
-                        .foregroundStyle(.red)
-                } else {
-                    Text("학생증 코드는 7글자여야 합니다.")
-                        .foregroundStyle(.background)
-                }
-            }
-            .padding(.horizontal)
-            
-            Spacer()
-            Spacer()
-            
-            Button {
-                validateCode()
-                if isValid {
-                    UserDefaults.standard.set(temporaryCode, forKey: "savedCode")
-                    inputCode = temporaryCode
-                    isShowing = false
-                    HapticManager.instance.notification(notificationType: .success)
-                }
-            } label: {
-                Text("계속")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .background {
-                        RoundedRectangle(cornerRadius: 10)
+        NavigationStack {
+            VStack {
+                Text("학생증 시작하기")
+                    .font(.largeTitle)
+                    .bold()
+                
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "person.text.rectangle.fill")
+                            .resizable()
+                            .scaledToFit()
                             .foregroundStyle(.accent)
+                            .frame(width: 50, height: 50)
+                        Text("학생증의 프로필 사진 밑에 있는 7자리 코드를 적어주세요.")
+                        
                     }
+                    HStack(spacing: 16) {
+                        Image(systemName: "person.slash.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.accent)
+                            .frame(width: 50, height: 50)
+                        Text("학생증 코드는 한 번 등록하면 변경할 수 없습니다.")
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                Spacer()
+                
+                Group {
+                    TextField("학생증 코드", text: $temporaryCode)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: 50)
+                        .background {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.gray)
+                        }
+                        .keyboardType(.asciiCapable)
+                        .onChange(of: temporaryCode, { oldValue, newValue in
+                            if newValue.count > 7 {
+                                temporaryCode = String(newValue.prefix(7))
+                            }
+                        })
+                        .onSubmit {
+                            validateCode()
+                        }
+                    if !isValid {
+                        Text("학생증 코드는 7글자여야 합니다.")
+                            .foregroundStyle(.red)
+                    } else {
+                        Text("학생증 코드는 7글자여야 합니다.")
+                            .foregroundStyle(.background)
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                Spacer()
+                
+                Button {
+                    validateCode()
+                    if isValid {
+                        UserDefaults.standard.set(temporaryCode, forKey: "savedCode")
+                        inputCode = temporaryCode
+                        isShowing = false
+                        HapticManager.instance.notification(notificationType: .success)
+                    }
+                } label: {
+                    Text("계속")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, maxHeight: 35)
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Spacer()
             }
-            
-            Spacer()
+            .padding(.horizontal)
+            .padding(.horizontal)
+            .toolbar {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                }
+            }
         }
-        .padding(.horizontal)
-        .padding(.horizontal)
     }
     
     private func validateCode() {
