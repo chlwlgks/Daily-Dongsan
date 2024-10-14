@@ -174,7 +174,7 @@ struct NotificationSettingsView: View {
     private func scheduleNotification(meal: String, time: Date) {
         let content = UNMutableNotificationContent()
         content.title = "데일리 동산"
-        content.body = "오늘의 \(body) 메뉴를 확인해 보세요. 🍽️"
+        content.body = "오늘의 \(meal) 메뉴를 확인해 보세요. 🍽️"
         content.sound = UNNotificationSound.default
         
         var dateComponents = DateComponents()

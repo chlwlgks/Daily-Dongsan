@@ -73,6 +73,7 @@ struct BarcodeView: View {
             }
         }
         .onAppear {
+            savedCode = UserDefaults.standard.string(forKey: "savedCode")
             if savedCode == nil {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
                     isShowingBarcodeSetupView = true

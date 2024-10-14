@@ -9,8 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-//    @State var resetBarcode: Bool = UserDefaults.standard.bool(forKey: "resetBarcode")
-    @State var resetBarcode: Bool = true
+    @State var resetBarcode: Bool = UserDefaults.standard.bool(forKey: "resetBarcode")
     
     @State private var isShowingBarcodeResetView: Bool = false
     
