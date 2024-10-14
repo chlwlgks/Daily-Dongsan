@@ -8,11 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		C47B1E792CBA2079007309E6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C47B1E782CBA2079007309E6 /* FirebaseFirestore */; };
-		C4E71EE62CBD4F0A000D8C1E /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = C4E71EE52CBD4F0A000D8C1E /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C4E71EE52CBD4F0A000D8C1E /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; name = .gitignore; path = "Daily Dongsan/Views/.gitignore"; sourceTree = "<group>"; };
 		C4F1CABD2C955E9A0031BB29 /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -39,7 +37,6 @@
 		C4F1CAB42C955E9A0031BB29 = {
 			isa = PBXGroup;
 			children = (
-				C4E71EE52CBD4F0A000D8C1E /* .gitignore */,
 				C4F1CABF2C955E9A0031BB29 /* Daily Dongsan */,
 				C4F1CABE2C955E9A0031BB29 /* Products */,
 			);
@@ -121,7 +118,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4E71EE62CBD4F0A000D8C1E /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
