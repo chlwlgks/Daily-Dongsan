@@ -151,6 +151,16 @@ struct NotificationSettingsView: View {
                 }
             }
             .navigationTitle("알림")
+            .onAppear {
+                breakfastNotification = UserDefaults.standard.bool(forKey: "breakfastNotification")
+                breakfastTime = (UserDefaults.standard.object(forKey: "breakfastTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+
+                lunchNotification = UserDefaults.standard.bool(forKey: "lunchNotification")
+                lunchTime = (UserDefaults.standard.object(forKey: "lunchTime") as? Date) ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+
+                dinnerNotification = UserDefaults.standard.bool(forKey: "dinnerNotification")
+                dinnerTime = (UserDefaults.standard.object(forKey: "dinnerTime") as? Date) ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
+            }
         }
     }
     
