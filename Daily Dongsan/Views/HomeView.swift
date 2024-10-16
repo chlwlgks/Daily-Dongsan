@@ -25,12 +25,12 @@ struct HomeView: View {
     
     @State private var isShowingSettingsView: Bool = false
     
-    @State var dkdrlah = 0
+//    @State var dkdrlah = 0
     
     var body: some View {
         NavigationStack {
             VStack {
-                Text("\(dkdrlah)")
+//                Text("\(dkdrlah)")
                 if horizontalSizeClass == .regular {
                     RegularHomeView(meals: meals, currentDate: currentDate, errorMessage: errorMessage)
                 } else {
@@ -140,19 +140,19 @@ struct HomeView: View {
         return dateFormatter.string(from: Date())
     }
     
-    private func startMidnightTimer() {
-        let calendar = Calendar.current
-        let now = Date()
-        let nextMidnight = calendar.nextDate(after: now, matching: DateComponents(hour: 0), matchingPolicy: .nextTime) ?? now
-        
-        let timeInterval = nextMidnight.timeIntervalSince(now)
-        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
-            currentDate = currentDateString()
-            fetchMeals(date: Date())
-            startMidnightTimer()
-            dkdrlah += 1
-        }
-    }
+//    private func startMidnightTimer() {
+//        let calendar = Calendar.current
+//        let now = Date()
+//        let nextMidnight = calendar.nextDate(after: now, matching: DateComponents(hour: 0), matchingPolicy: .nextTime) ?? now
+//        
+//        let timeInterval = nextMidnight.timeIntervalSince(now)
+//        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
+//            currentDate = currentDateString()
+//            fetchMeals(date: Date())
+//            startMidnightTimer()
+//            dkdrlah += 1
+//        }
+//    }
     
     private func fetchMeals(date: Date) {
         guard let apiKey else {
