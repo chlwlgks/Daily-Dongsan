@@ -6,41 +6,49 @@
 //
 
 import SwiftUI
+import Network
 
 struct MealsView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
-    @State var meals = [
+    @State private var isConnected: Bool = true
+    
+    @State var meals: [Meal]? = [
         Meal(id: "1", mealTime: "조식", name: "급식 정보가 없습니다.", calorie: ""),
         Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""),
         Meal(id: "3", mealTime: "석식", name: "급식 정보가 없습니다.", calorie: "")
     ]
-    private let mealTimes: [String : String] = ["1" : "조식", "2" : "중식", "3" : "석식"]
-    
-    @State var errorMessage: String?
-    
-    private let apiKey = Bundle.main.infoDictionary?["API Key"]
-    
     @State private var selectedDate = Date()
     
     var body: some View {
         NavigationStack {
             Group {
-                if horizontalSizeClass == .regular {
-                    RegularMealView(meals: meals, selectedDate: $selectedDate, errorMessage: errorMessage)
+                if !isConnected {
+                    OfflineView()
                 } else {
-                    CompactMealView(meals: meals, selectedDate: $selectedDate, errorMessage: errorMessage)
-                        .navigationBarTitleDisplayMode(.inline)
+                    Group {
+                        if horizontalSizeClass == .regular {
+                            RegularMealView(meals: meals, selectedDate: $selectedDate)
+                        } else {
+                            CompactMealView(meals: meals, selectedDate: $selectedDate)
+                                .navigationBarTitleDisplayMode(.inline)
+                        }
+                    }
+                    .navigationTitle("식단")
                 }
             }
             .listStyle(.plain)
             .padding(.horizontal)
-            .navigationTitle("식단")
             .onAppear {
-                fetchMeals(date: selectedDate)
+                monitorNetwork()
+                Task {
+                    meals = try await fetchMeals(date: selectedDate)
+                }
             }
             .onChange(of: selectedDate) {
-                fetchMeals(date: selectedDate)
+                Task {
+                    meals = try await fetchMeals(date: selectedDate)
+                }
             }
         }
     }
@@ -48,7 +56,6 @@ struct MealsView: View {
     private struct RegularMealView: View {
         let meals: [Meal]?
         @Binding var selectedDate: Date
-        let errorMessage: String?
         
         var body: some View {
             HStack(alignment: .top) {
@@ -68,31 +75,18 @@ struct MealsView: View {
                         dateFormatter.dateFormat = "MMMM d일 EEEE"
                         return dateFormatter.string(from: selectedDate)
                     }
+                    
                     Text(formattedDate)
                         .font(.title3)
                         .bold()
-                    
-                    if let errorMessage {
-                        HStack{
-                            Spacer()
-                            VStack {
+                    List(meals!) { meal in
+                        Section {
+                            Text(meal.name)
+                        } header: {
+                            HStack {
+                                Text(meal.mealTime)
                                 Spacer()
-                                Text(errorMessage)
-                                    .multilineTextAlignment(.center)
-                                Spacer()
-                            }
-                            Spacer()
-                        }
-                    } else if let meals {
-                        List(meals) { meal in
-                            Section {
-                                Text(meal.name)
-                            } header: {
-                                HStack {
-                                    Text(meal.mealTime)
-                                    Spacer()
-                                    Text(meal.calorie)
-                                }
+                                Text(meal.calorie)
                             }
                         }
                     }
@@ -102,38 +96,30 @@ struct MealsView: View {
     }
     
     private struct CompactMealView: View {
-        let meals: [Meal]?
+        var meals: [Meal]?
         @Binding var selectedDate: Date
-        let errorMessage: String?
         
         var body: some View {
             VStack {
                 DatePicker("날짜", selection: $selectedDate, displayedComponents: .date)
                     .datePickerStyle(.graphical)
                 
-                if let errorMessage {
-                    Spacer()
-                    Text(errorMessage)
-                        .multilineTextAlignment(.center)
-                    Spacer()
-                } else if let meals {
-                    var formattedDate: String {
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.locale = Locale(identifier: "ko_KR")
-                        dateFormatter.dateFormat = "MMMM d일 EEEE"
-                        return dateFormatter.string(from: selectedDate)
-                    }
-                    
-                    VStack {
-                        List(meals) { meal in
-                            Section {
-                                Text(meal.name)
-                            } header: {
-                                HStack {
-                                    Text(meal.mealTime)
-                                    Spacer()
-                                    Text(meal.calorie)
-                                }
+                var formattedDate: String {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.locale = Locale(identifier: "ko_KR")
+                    dateFormatter.dateFormat = "MMMM d일 EEEE"
+                    return dateFormatter.string(from: selectedDate)
+                }
+                
+                VStack {
+                    List(meals!) { meal in
+                        Section {
+                            Text(meal.name)
+                        } header: {
+                            HStack {
+                                Text(meal.mealTime)
+                                Spacer()
+                                Text(meal.calorie)
                             }
                         }
                     }
@@ -142,85 +128,23 @@ struct MealsView: View {
         }
     }
     
-    func fetchMeals(date: Date) {
-        guard let apiKey else {
-            error("API Key가 존재하지 않습니다.")
-            return
-        }
+    func monitorNetwork() {
+        let monitor = NWPathMonitor()
+        let queue = DispatchQueue(label: "Network Monitor")
         
-        let dateformatter = DateFormatter()
-        dateformatter.dateFormat = "yyyyMMdd"
-        let currentDate = dateformatter.string(from: date)
-        
-        let url = "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(currentDate)"
-        guard let url = URL(string: url) else {
-            error("URL 생성에 실패했습니다.")
-            return
-        }
-        
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let error {
-                self.error(error.localizedDescription)
-                return
-            }
-            
-            guard let data else {
-                self.error("데이터가 없습니다.")
-                return
-            }
-            
-            do {
-                let response = try JSONDecoder().decode(Mealresponse.self, from: data)
-                
-                guard let rows = response.mealServiceDietInfo[1].row else {
-                    self.error("데이터가 없습니다.")
-                    return
-                }
-                
-                var fetchedMeals: [Meal] = []
-                
-                for mealTypeCode in ["1", "2", "3"] {
-                    guard let mealTypeName = self.mealTimes[mealTypeCode] else {
-                        self.error("데이터가 없습니다.")
-                        return
+        monitor.pathUpdateHandler = { path in
+            DispatchQueue.main.async {
+                if path.status == .satisfied {
+                    Task {
+                        try await fetchMeals(date: selectedDate)
                     }
-                    
-                    if let mealInfo = rows.first(where: { mealInfo in
-                        mealInfo.MMEAL_SC_CODE == mealTypeCode
-                    }) {
-                        let mealName = mealInfo.DDISH_NM.replacingOccurrences(of: "<br/>", with: "\n")
-                        let calorie = mealInfo.CAL_INFO
-                        
-                        fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: calorie))
-                    } else {
-                        fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: "급식 정보가 없습니다.", calorie: ""))
-                    }
-                }
-                
-                DispatchQueue.main.async {
-                    meals = fetchedMeals
-                    errorMessage = nil
-                }
-            } catch {
-                var tempMeals: [Meal] = []
-                
-                tempMeals.append(Meal(id: "1", mealTime: "조식", name: "급식 정보가 없습니다.", calorie: ""))
-                tempMeals.append(Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""))
-                tempMeals.append(Meal(id: "3", mealTime: "석식", name: "급식 정보가 없습니다.", calorie: ""))
-                
-                DispatchQueue.main.async {
-                    meals = tempMeals
-                    errorMessage = nil
+                    isConnected = true
+                } else {
+                    isConnected = false
                 }
             }
         }
-        .resume()
-    }
-    
-    private func error(_ message: String) {
-        DispatchQueue.main.async {
-            errorMessage = message
-        }
+        monitor.start(queue: queue)
     }
 }
 

@@ -14,15 +14,15 @@ struct Meal: Identifiable {
     let calorie: String
 }
 
-struct Mealresponse: Decodable {
+struct Mealresponse: Codable {
     var mealServiceDietInfo: [MealServiceDietInfo]
 }
 
-struct MealServiceDietInfo: Decodable {
+struct MealServiceDietInfo: Codable {
     var row: [MealRow]?
 }
 
-struct MealRow: Decodable {
+struct MealRow: Codable {
     var MMEAL_SC_CODE: String //식사코드
     var MMEAL_SC_NM: String // 식사명
     var MLSV_YMD: String //급식일자

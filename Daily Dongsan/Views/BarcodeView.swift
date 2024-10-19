@@ -16,13 +16,7 @@ struct BarcodeView: View {
     private let code39Patterns: [Character: String] = [
         "0": "101001101101", "1": "110100101011", "2": "101100101011", "3": "110110010101",
         "4": "101001101011", "5": "110100110101", "6": "101100110101", "7": "101001011011",
-        "8": "110100101101", "9": "101100101101", "A": "110101001011", "B": "101101001011",
-        "C": "110110100101", "D": "101011001011", "E": "110101100101", "F": "101101100101",
-        "G": "101010011011", "H": "110101001101", "I": "101101001101", "J": "101011001101",
-        "K": "110101010011", "L": "101101010011", "M": "110110101001", "N": "101011010011",
-        "O": "110101101001", "P": "101101101001", "Q": "101010110011", "R": "110101011001",
-        "S": "101101011001", "T": "101011011001", "U": "110010101011", "V": "100110101011",
-        "W": "110011010101", "X": "100101101011", "Y": "110010110101", "Z": "100110110101",
+        "8": "110100101101", "9": "101100101101", "D": "101011001011", "S": "101101011001",
         "*": "100101101101"
     ]
     
@@ -70,6 +64,7 @@ struct BarcodeView: View {
                 .navigationTitle("학생증")
                 .padding(.horizontal)
                 .padding(.horizontal)
+                .frame(maxWidth: 500)
             }
         }
         .onAppear {
@@ -88,7 +83,7 @@ struct BarcodeView: View {
     private func generateCode39(input: String) -> String {
         var code39 = code39Patterns["*"]! + "0"
         
-        for character in input.uppercased() {
+        for character in input {
             if let pattern = code39Patterns[character] {
                 code39 += pattern + "0"
             }
@@ -109,16 +104,16 @@ struct BarcodeSetupView: View {
     @State private var isValid: Bool = true
     
     private class HapticManager {
-        static let instance = HapticManager()
+        @MainActor static let instance = HapticManager()
         
-        func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
+        @MainActor func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
             UINotificationFeedbackGenerator().notificationOccurred(notificationType)
         }
     }
     
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack() {
                 Text("학생증 시작하기")
                     .font(.largeTitle)
                     .bold()
@@ -132,7 +127,7 @@ struct BarcodeSetupView: View {
                             .scaledToFit()
                             .foregroundStyle(.accent)
                             .frame(width: 50, height: 50)
-                        Text("학생증의 프로필 사진 밑에 있는 7자리 코드를 적어주세요.")
+                        Text("학생증의 증명사진 밑에 있는 코드를 입력해 주세요.")
                         
                     }
                     HStack(spacing: 16) {
@@ -147,43 +142,44 @@ struct BarcodeSetupView: View {
                 .padding(.horizontal)
                 
                 Spacer()
-                Spacer()
                 
                 Group {
-                    TextField("학생증 코드", text: $temporaryCode)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: 50)
-                        .background {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray)
-                        }
-                        .keyboardType(.asciiCapable)
-                        .onChange(of: temporaryCode, { oldValue, newValue in
-                            if newValue.count > 7 {
-                                temporaryCode = String(newValue.prefix(7))
+                    HStack(spacing: 16) {
+                        Text("DS")
+                        TextField("학생증 코드", text: $temporaryCode)
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: 50)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray)
                             }
-                        })
-                        .onSubmit {
-                            validateCode()
-                        }
+                            .keyboardType(.numberPad)
+                            .onChange(of: temporaryCode, { oldValue, newValue in
+                                if newValue.count > 5 {
+                                    temporaryCode = String(newValue.prefix(5))
+                                }
+                            })
+                            .onSubmit {
+                                validateCode()
+                            }
+                    }
                     if !isValid {
-                        Text("학생증 코드는 7글자여야 합니다.")
+                        Text("학생증 코드는 5자리 숫자여야 합니다.")
                             .foregroundStyle(.red)
                     } else {
-                        Text("학생증 코드는 7글자여야 합니다.")
+                        Text("학생증 코드는 5자리 숫자여야 합니다.")
                             .foregroundStyle(.background)
                     }
                 }
                 .padding(.horizontal)
                 
                 Spacer()
-                Spacer()
                 
                 Button {
                     validateCode()
                     if isValid {
-                        UserDefaults.standard.set(temporaryCode, forKey: "savedCode")
-                        inputCode = temporaryCode
+                        inputCode = "DS" + temporaryCode
+                        UserDefaults.standard.set(inputCode, forKey: "savedCode")
                         isShowing = false
                         HapticManager.instance.notification(notificationType: .success)
                     }
@@ -205,11 +201,16 @@ struct BarcodeSetupView: View {
                     Image(systemName: "xmark.circle.fill")
                 }
             }
+            .frame(maxWidth: 500)
         }
     }
     
     private func validateCode() {
-        isValid = temporaryCode.count == 7
+        if temporaryCode.count == 5 && temporaryCode.allSatisfy(\.isNumber) {
+            isValid = true
+        } else {
+            isValid = false
+        }
     }
 }
 

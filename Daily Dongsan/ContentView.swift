@@ -47,9 +47,9 @@ struct BarcodeResetView: View {
     @State private var passcode: String = ""
     
     private class HapticManager {
-        static let instance = HapticManager()
+        @MainActor static let instance = HapticManager()
         
-        func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
+        @MainActor func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
             UINotificationFeedbackGenerator().notificationOccurred(notificationType)
         }
     }

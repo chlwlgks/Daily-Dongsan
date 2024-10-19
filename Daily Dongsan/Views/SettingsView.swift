@@ -28,16 +28,6 @@ struct SettingsView: View {
                 }
                 
                 Section {
-                    NavigationLink {
-                        AppInfoView()
-                    } label: {
-                        Label {
-                            Text("앱 정보")
-                        } icon: {
-                            IconView(foregroundStyle: Color.gray, systemImage: "info.circle.fill")
-                        }
-                    }
-                    
                     Button {
                         isShowingPrivacyPolicyView = true
                     } label: {
@@ -48,6 +38,26 @@ struct SettingsView: View {
                         }
                     }
                     .foregroundStyle(.foreground)
+                    
+                    NavigationLink {
+                        ContactDeveloperView()
+                    } label: {
+                        Label {
+                            Text("개발자에게 연락하기")
+                        } icon: {
+                            IconView(foregroundStyle: Color.gray, systemImage: "message.fill")
+                        }
+                    }
+                    
+                    NavigationLink {
+                        AppInfoView()
+                    } label: {
+                        Label {
+                            Text("앱 정보")
+                        } icon: {
+                            IconView(foregroundStyle: Color.gray, systemImage: "info.circle.fill")
+                        }
+                    }
                 }
             }
             .navigationTitle("설정")
@@ -74,7 +84,7 @@ struct IconView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 7)
                 .foregroundStyle(foregroundStyle)
-                .frame(width: 30, height: 30)
+                .frame(width: 29, height: 29)
             Image(systemName: systemImage)
                 .resizable()
                 .scaledToFit()
