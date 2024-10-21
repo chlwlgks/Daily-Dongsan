@@ -41,7 +41,7 @@ struct HomeView: View {
             .onAppear {
                 monitorNetwork()
                 Task {
-                    try await fetchMeals(date: Date())
+                    meals = try await fetchMeals(date: Date())
                 }
             }
             .toolbar {

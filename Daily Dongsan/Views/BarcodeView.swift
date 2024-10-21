@@ -64,7 +64,7 @@ struct BarcodeView: View {
                 .navigationTitle("학생증")
                 .padding(.horizontal)
                 .padding(.horizontal)
-                .frame(maxWidth: 500)
+                .frame(maxWidth: 450)
             }
         }
         .onAppear {
@@ -113,7 +113,7 @@ struct BarcodeSetupView: View {
     
     var body: some View {
         NavigationStack {
-            VStack() {
+            VStack {
                 Text("학생증 시작하기")
                     .font(.largeTitle)
                     .bold()
@@ -146,33 +146,36 @@ struct BarcodeSetupView: View {
                 Group {
                     HStack(spacing: 16) {
                         Text("DS")
-                        TextField("학생증 코드", text: $temporaryCode)
-                            .padding()
-                            .frame(maxWidth: .infinity, maxHeight: 50)
-                            .background {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray)
-                            }
-                            .keyboardType(.numberPad)
-                            .onChange(of: temporaryCode, { oldValue, newValue in
-                                if newValue.count > 5 {
-                                    temporaryCode = String(newValue.prefix(5))
+                        VStack {
+                            TextField("학생증 코드", text: $temporaryCode)
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: 50)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray)
                                 }
-                            })
-                            .onSubmit {
-                                validateCode()
+                                .keyboardType(.numberPad)
+                                .onChange(of: temporaryCode, { oldValue, newValue in
+                                    if newValue.count > 5 {
+                                        temporaryCode = String(newValue.prefix(5))
+                                    }
+                                })
+                                .onSubmit {
+                                    validateCode()
+                                }
+                            if !isValid {
+                                Text("학생증 코드는 5자리 숫자여야 합니다.")
+                                    .foregroundStyle(.red)
+                            } else {
+                                Text("학생증 코드는 5자리 숫자여야 합니다.")
+                                    .foregroundStyle(.background)
                             }
-                    }
-                    if !isValid {
-                        Text("학생증 코드는 5자리 숫자여야 합니다.")
-                            .foregroundStyle(.red)
-                    } else {
-                        Text("학생증 코드는 5자리 숫자여야 합니다.")
-                            .foregroundStyle(.background)
+                        }
                     }
                 }
                 .padding(.horizontal)
                 
+                Spacer()
                 Spacer()
                 
                 Button {
@@ -189,8 +192,9 @@ struct BarcodeSetupView: View {
                         .frame(maxWidth: .infinity, maxHeight: 35)
                 }
                 .buttonStyle(.borderedProminent)
-                
-                Spacer()
+                .padding(.bottom)
+                .padding(.bottom)
+                .padding(.bottom)
             }
             .padding(.horizontal)
             .padding(.horizontal)
@@ -201,7 +205,7 @@ struct BarcodeSetupView: View {
                     Image(systemName: "xmark.circle.fill")
                 }
             }
-            .frame(maxWidth: 500)
+            .frame(maxWidth: 450)
         }
     }
     

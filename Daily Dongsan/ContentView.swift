@@ -56,10 +56,7 @@ struct BarcodeResetView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .center) {
-                Spacer()
-                Spacer()
-                Spacer()
+            VStack {
                 Spacer()
                 
                 SecureField("암호 입력", text: $passcode)
@@ -71,9 +68,6 @@ struct BarcodeResetView: View {
                     .padding(.horizontal)
                     .keyboardType(.numberPad)
                 
-                Spacer()
-                Spacer()
-                Spacer()
                 Spacer()
                 
                 Button {
@@ -88,8 +82,9 @@ struct BarcodeResetView: View {
                         .frame(maxWidth: .infinity, maxHeight: 35)
                 }
                 .buttonStyle(.borderedProminent)
-                
-                Spacer()
+                .padding(.bottom)
+                .padding(.bottom)
+                .padding(.bottom)
             }
             .navigationBarTitle("학생증 재설정")
             .toolbar {
