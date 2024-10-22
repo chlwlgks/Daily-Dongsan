@@ -104,9 +104,9 @@ struct BarcodeSetupView: View {
     @State private var isValid: Bool = true
     
     private class HapticManager {
-        @MainActor static let instance = HapticManager()
+        static let instance = HapticManager()
         
-        @MainActor func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
+        func notification(notificationType: UINotificationFeedbackGenerator.FeedbackType) {
             UINotificationFeedbackGenerator().notificationOccurred(notificationType)
         }
     }
@@ -144,9 +144,9 @@ struct BarcodeSetupView: View {
                 Spacer()
                 
                 Group {
-                    HStack(spacing: 16) {
-                        Text("DS")
-                        VStack {
+                    VStack {
+                        HStack(spacing: 16) {
+                            Text("DS")
                             TextField("학생증 코드", text: $temporaryCode)
                                 .padding()
                                 .frame(maxWidth: .infinity, maxHeight: 50)
@@ -163,13 +163,13 @@ struct BarcodeSetupView: View {
                                 .onSubmit {
                                     validateCode()
                                 }
-                            if !isValid {
-                                Text("학생증 코드는 5자리 숫자여야 합니다.")
-                                    .foregroundStyle(.red)
-                            } else {
-                                Text("학생증 코드는 5자리 숫자여야 합니다.")
-                                    .foregroundStyle(.background)
-                            }
+                        }
+                        if !isValid {
+                            Text("학생증 코드는 5자리 숫자여야 합니다.")
+                                .foregroundStyle(.red)
+                        } else {
+                            Text("학생증 코드는 5자리 숫자여야 합니다.")
+                                .foregroundStyle(.background)
                         }
                     }
                 }

@@ -43,7 +43,7 @@ struct SettingsView: View {
                         ContactDeveloperView()
                     } label: {
                         Label {
-                            Text("개발자에게 연락하기")
+                            Text("개발자에게 문의하기")
                         } icon: {
                             IconView(foregroundStyle: Color.gray, systemImage: "message.fill")
                         }
