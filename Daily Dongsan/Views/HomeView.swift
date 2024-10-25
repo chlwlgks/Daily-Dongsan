@@ -64,8 +64,7 @@ struct HomeView: View {
         var body: some View {
             VStack {
                 Text(currentDate)
-                    .font(.title3)
-                    .bold()
+                    .font(.system(.title3, weight: .bold))
                     .padding(.bottom)
                 
                 HStack(alignment: .top) {
@@ -76,7 +75,7 @@ struct HomeView: View {
                                 Spacer()
                                 Text(meal.calorie)
                             }
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(.secondary)
                             
                             Text(meal.name)
                         }
@@ -99,8 +98,7 @@ struct HomeView: View {
         var body: some View {
             VStack {
                 Text(currentDate)
-                    .font(.title3)
-                    .bold()
+                    .font(.system(.title3, weight: .bold))
                 
                 List(meals) { meal in
                     Section {
@@ -118,7 +116,7 @@ struct HomeView: View {
         }
     }
     
-    func monitorNetwork() {
+    private func monitorNetwork() {
         let monitor = NWPathMonitor()
         let queue = DispatchQueue(label: "Network Monitor")
         

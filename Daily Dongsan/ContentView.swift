@@ -63,7 +63,7 @@ struct BarcodeResetView: View {
                     .padding()
                     .background {
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray)
+                            .stroke(Color.secondary)
                     }
                     .padding(.horizontal)
                     .keyboardType(.numberPad)
@@ -96,6 +96,7 @@ struct BarcodeResetView: View {
             }
             .padding(.horizontal)
             .padding(.horizontal)
+            .frame(maxWidth: 450)
         }
     }
 }

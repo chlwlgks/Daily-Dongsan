@@ -10,6 +10,10 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     
+    @State private var breakfastNotification: Bool = UserDefaults.standard.bool(forKey: "breakfastNotification")
+    @State private var lunchNotification: Bool = UserDefaults.standard.bool(forKey: "lunchNotification")
+    @State private var dinnerNotification: Bool = UserDefaults.standard.bool(forKey: "dinnerNotification")
+    
     @State private var isShowingPrivacyPolicyView: Bool = false
     
     var body: some View {
@@ -19,10 +23,20 @@ struct SettingsView: View {
                     NavigationLink {
                         NotificationSettingsView()
                     } label: {
-                        Label {
-                            Text("알림")
-                        } icon: {
-                            IconView(foregroundStyle: Color.red, systemImage: "bell.badge.fill")
+                        HStack {
+                            Label {
+                                Text("알림")
+                            } icon: {
+                                IconView(foregroundStyle: Color.red, systemImage: "bell.badge.fill")
+                            }
+                            Spacer()
+                            if breakfastNotification || lunchNotification || dinnerNotification {
+                                Text("켬")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("끔")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
@@ -68,6 +82,11 @@ struct SettingsView: View {
                 } label: {
                     Text("완료")
                 }
+            }
+            .onAppear {
+                breakfastNotification = UserDefaults.standard.bool(forKey: "breakfastNotification")
+                lunchNotification = UserDefaults.standard.bool(forKey: "lunchNotification")
+                dinnerNotification = UserDefaults.standard.bool(forKey: "dinnerNotification")
             }
             .sheet(isPresented: $isShowingPrivacyPolicyView) {
                 PrivacyPolicyView()

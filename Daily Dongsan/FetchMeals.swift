@@ -5,7 +5,7 @@
 //  Created by 최지한 on 10/19/24.
 //
 
-import Foundation
+import FirebaseFirestore
 
 private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
 
@@ -29,22 +29,43 @@ func fetchMeals(date: Date) async throws -> [Meal] {
         var fetchedMeals: [Meal] = []
         
         for mealTypeCode in ["1", "2", "3"] {
-            let mealTypeName = mealTimes[mealTypeCode]!
-            
-            if let mealInfo = rows!.first(where: { mealInfo in
-                mealInfo.MMEAL_SC_CODE == mealTypeCode
-            }) {
-                let mealName = mealInfo.DDISH_NM.replacingOccurrences(of: "<br/>", with: "\n")
-                let calorie = mealInfo.CAL_INFO
+            if mealTypeCode == "2" {
+                let mealInfo = rows!.first
+                let mealName = mealInfo?.DDISH_NM.replacingOccurrences(of: "<br/>", with: "\n") ?? "급식 정보가 없습니다."
+                let calorie = mealInfo?.CAL_INFO ?? ""
                 
-                fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: calorie))
+                fetchedMeals.append(Meal(id: "2", mealTime: "중식", name: mealName, calorie: calorie))
             } else {
-                fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: "급식 정보가 없습니다.", calorie: ""))
+                let mealTypeName = mealTimes[mealTypeCode]!
+                
+                let db = Firestore.firestore()
+                
+                let yearFormatter = DateFormatter()
+                yearFormatter.dateFormat = "yyyy"
+                let year = yearFormatter.string(from: date)
+                
+                let monthFormatter = DateFormatter()
+                monthFormatter.dateFormat = "MM"
+                let month = monthFormatter.string(from: date)
+                
+                let dayFormatter = DateFormatter()
+                dayFormatter.dateFormat = "dd"
+                let day = dayFormatter.string(from: date)
+                
+                do {
+                    var mealName = try await db.collection("meals").document(year).collection(month).document(day).getDocument().data()?[mealTypeName] as? String ?? "급식 정보가 없습니다."
+                    mealName = mealName.replacingOccurrences(of: "\\n", with: "\n")
+                    
+                    fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: ""))
+                } catch {
+                    print(error.localizedDescription)
+                }
             }
         }
         
         return fetchedMeals
     } catch {
+        print(error.localizedDescription)
         return [
             Meal(id: "1", mealTime: "조식", name: "급식 정보가 없습니다.", calorie: ""),
             Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""),

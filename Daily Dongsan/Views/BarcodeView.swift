@@ -12,6 +12,7 @@ struct BarcodeView: View {
     @State private var savedCode: String? = UserDefaults.standard.string(forKey: "savedCode")
     
     @State private var isShowingBarcodeSetupView: Bool = false
+    @State private var isShowingHelpView: Bool = false
     
     private let code39Patterns: [Character: String] = [
         "0": "101001101101", "1": "110100101011", "2": "101100101011", "3": "110110010101",
@@ -47,6 +48,13 @@ struct BarcodeView: View {
                 }
                 .padding()
                 .navigationTitle("학생증")
+                .toolbar {
+                    Button {
+                        isShowingHelpView = true
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                }
             } else {
                 Button {
                     isShowingBarcodeSetupView = true
@@ -77,6 +85,9 @@ struct BarcodeView: View {
         }
         .sheet(isPresented: $isShowingBarcodeSetupView) {
             BarcodeSetupView(isShowing: $isShowingBarcodeSetupView, inputCode: $savedCode)
+        }
+        .sheet(isPresented: $isShowingHelpView) {
+            HelpView()
         }
     }
     
@@ -115,8 +126,7 @@ struct BarcodeSetupView: View {
         NavigationStack {
             VStack {
                 Text("학생증 시작하기")
-                    .font(.largeTitle)
-                    .bold()
+                    .font(.system(.largeTitle, weight: .bold))
                 
                 Spacer()
                 
@@ -152,7 +162,7 @@ struct BarcodeSetupView: View {
                                 .frame(maxWidth: .infinity, maxHeight: 50)
                                 .background {
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.gray)
+                                        .stroke(Color.secondary)
                                 }
                                 .keyboardType(.numberPad)
                                 .onChange(of: temporaryCode, { oldValue, newValue in
@@ -167,9 +177,6 @@ struct BarcodeSetupView: View {
                         if !isValid {
                             Text("학생증 코드는 5자리 숫자여야 합니다.")
                                 .foregroundStyle(.red)
-                        } else {
-                            Text("학생증 코드는 5자리 숫자여야 합니다.")
-                                .foregroundStyle(.background)
                         }
                     }
                 }
@@ -214,6 +221,40 @@ struct BarcodeSetupView: View {
             isValid = true
         } else {
             isValid = false
+        }
+    }
+}
+
+struct HelpView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("코드를 변경하고 싶어요.")
+                        .font(.headline)
+                    Text("학생증 코드는 개발자에게 문의해야만 변경할 수 있습니다.")
+                    
+                    Divider()
+                        .padding(.vertical)
+                    
+                    Text("바코드 인식이 안 될 경우")
+                        .font(.headline)
+                    Text("· 밝기를 올려 주세요.")
+                    Text("· 바코드를 충분히 가까이 대주세요.")
+                }
+                .padding()
+            }
+            .navigationTitle("학생증 도움말")
+            .toolbar {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("완료")
+                }
+                
+            }
         }
     }
 }

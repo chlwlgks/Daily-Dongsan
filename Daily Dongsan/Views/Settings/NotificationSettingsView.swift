@@ -17,39 +17,9 @@ struct NotificationSettingsView: View {
     @State private var dinnerNotification: Bool = UserDefaults.standard.bool(forKey: "dinnerNotification")
     @State private var dinnerTime: Date = (UserDefaults.standard.object(forKey: "dinnerTime") as? Date ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())) ?? Date()
     
-    @State private var isNotificationEnabled: Bool = true
-    
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    if !isNotificationEnabled {
-                        HStack(spacing: 16) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 13)
-                                    .foregroundStyle(Color.red)
-                                    .frame(width: 60, height: 60)
-                                Image(systemName: "bell.badge.slash.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.white)
-                                    .frame(width: 35, height: 35)
-                            }
-                            VStack {
-                                Text("알림 권한이 거부되어 있습니다.")
-                                Button {
-                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                                } label: {
-                                    Text("설정")
-                                }
-                                .buttonStyle(.borderless)
-                            }
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-                
                 Section {
                     Toggle(isOn: $breakfastNotification) {
                         Text("조식 알림")
@@ -111,14 +81,9 @@ struct NotificationSettingsView: View {
     
     private func handleNotificationChange(meal: String, notificationEnabled: Bool, time: Date) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            if granted {
-                isNotificationEnabled = true
-            } else {
-                isNotificationEnabled = false
-            }
         }
         
-        if isNotificationEnabled && notificationEnabled {
+        if notificationEnabled {
             scheduleNotification(meal: meal, time: time)
         } else {
             let notificationCenter = UNUserNotificationCenter.current()
