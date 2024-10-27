@@ -97,19 +97,24 @@ struct NotificationSettingsView: View {
         content.body = "오늘의 \(meal) 메뉴를 확인해 보세요. 🍽️"
         content.sound = UNNotificationSound.default
         
-        var dateComponents = DateComponents()
-        dateComponents.calendar = Calendar.current
-        
         let calendar = Calendar.current
-        dateComponents.hour = calendar.component(.hour, from: time)
-        dateComponents.minute = calendar.component(.minute, from: time)
-        
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        
-        let request = UNNotificationRequest(identifier: meal, content: content, trigger: trigger)
+        let hour = calendar.component(.hour, from: time)
+        let minute = calendar.component(.minute, from: time)
         
         let notificationCenter = UNUserNotificationCenter.current()
-        notificationCenter.add(request)
+        
+        for weekday in 2...6 {
+            var datecomponents = DateComponents()
+            datecomponents.hour = hour
+            datecomponents.minute = minute
+            datecomponents.weekday = weekday
+            
+            let trigger = UNCalendarNotificationTrigger(dateMatching: datecomponents, repeats: true)
+            
+            let request = UNNotificationRequest(identifier: "\(meal)_\(weekday)", content: content, trigger: trigger)
+            
+            notificationCenter.add(request)
+        }
     }
 }
 
