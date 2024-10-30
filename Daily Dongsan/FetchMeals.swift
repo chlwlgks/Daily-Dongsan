@@ -56,6 +56,7 @@ func fetchMeals(date: Date) async throws -> [Meal] {
         do {
             var mealName = try await db.collection("meals").document(year).collection(month).document(day).getDocument().data()?[mealTypeName] as? String ?? "급식 정보가 없습니다."
             mealName = mealName.replacingOccurrences(of: ",", with: ".")
+            mealName = mealName.replacingOccurrences(of: "\\n", with: "\n")
             
             fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: ""))
         } catch {
