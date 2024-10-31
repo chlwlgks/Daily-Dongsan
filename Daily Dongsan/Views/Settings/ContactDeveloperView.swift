@@ -23,7 +23,7 @@ struct ContactDeveloperView: View {
                         Text("김병윤: ellio__ot")
                         Spacer()
                         Image(systemName: "link")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                 }
                 Button {
@@ -35,7 +35,7 @@ struct ContactDeveloperView: View {
                         Text("최지한: j1hxna")
                         Spacer()
                         Image(systemName: "link")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                     }
                 }
             }

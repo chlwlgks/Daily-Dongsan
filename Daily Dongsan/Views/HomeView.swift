@@ -64,7 +64,7 @@ struct HomeView: View {
         var body: some View {
             VStack {
                 Text(currentDate)
-                    .font(.system(.title3, weight: .bold))
+                    .font(.system(.title3, weight: .semibold))
                     .padding(.bottom)
                 
                 HStack(alignment: .top) {
@@ -75,6 +75,7 @@ struct HomeView: View {
                                 Spacer()
                                 Text(meal.calorie)
                             }
+                            .font(.system(.subheadline, weight: .semibold))
                             .foregroundStyle(.secondary)
                             
                             Text(meal.name)
