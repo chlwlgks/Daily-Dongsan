@@ -99,7 +99,7 @@ struct HomeView: View {
         var body: some View {
             VStack {
                 Text(currentDate)
-                    .font(.system(.title3, weight: .bold))
+                    .font(.system(.title3, weight: .semibold))
                 
                 List(meals) { meal in
                     Section {
