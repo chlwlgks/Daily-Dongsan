@@ -50,7 +50,7 @@ func fetchMeals(date: Date) async throws -> [Meal] {
         let month = monthFormatter.string(from: date)
         
         let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "dd"
+        dayFormatter.dateFormat = "d"
         let day = dayFormatter.string(from: date)
         
         do {
