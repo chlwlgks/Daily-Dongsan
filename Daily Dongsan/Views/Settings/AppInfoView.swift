@@ -19,7 +19,7 @@ struct AppInfoView: View {
                 Image("Daily_Dongsan")
                     .resizable()
                     .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
                     .frame(maxWidth: 100, maxHeight: 100)
                     .padding()
                 

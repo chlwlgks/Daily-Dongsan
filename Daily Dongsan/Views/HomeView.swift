@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Network
+import FirebaseFirestore
 
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -21,12 +22,33 @@ struct HomeView: View {
     
     @State private var isShowingSettingsView: Bool = false
     
+    @State private var announcement: String = ""
+    
     var body: some View {
         NavigationStack {
             Group {
                 if !isConnected {
                     OfflineView()
                 } else {
+                    if announcement != "" {
+                        HStack {
+                            Label {
+                                Text(announcement)
+                                Spacer()
+                            } icon: {
+                                Image(systemName: "megaphone.fill")
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .foregroundColor(.secondary)
+                                    .opacity(0.25)
+                            )
+                        }
+                        .padding()
+                    }
+                    
                     Group {
                         if horizontalSizeClass == .regular {
                             RegularHomeView(meals: meals, currentDate: currentDateString())
@@ -42,6 +64,7 @@ struct HomeView: View {
                 monitorNetwork()
                 Task {
                     meals = try await fetchMeals(date: Date())
+                    announcement = try await fetchAnnouncement()
                 }
             }
             .toolbar {
@@ -134,6 +157,14 @@ struct HomeView: View {
             }
         }
         monitor.start(queue: queue)
+    }
+    
+    private func fetchAnnouncement() async throws -> String {
+        let db = Firestore.firestore()
+        
+        let announcement = try await db.collection("announcement").document("content").getDocument().data()?["text"] as? String ?? ""
+        
+        return announcement
     }
     
     private func currentDateString() -> String {

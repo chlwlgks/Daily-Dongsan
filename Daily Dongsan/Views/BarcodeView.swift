@@ -43,18 +43,18 @@ struct BarcodeView: View {
                         )
                         
                         Text(savedCode)
+                        
+                        Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
+                            .multilineTextAlignment(.center)
+                            .padding(.top)
+                            .padding(.top)
+                            .padding(.top)
+                        
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .padding()
                 .navigationTitle("학생증")
-                .toolbar {
-                    Button {
-                        isShowingHelpView = true
-                    } label: {
-                        Image(systemName: "questionmark.circle")
-                    }
-                }
             } else {
                 Button {
                     isShowingBarcodeSetupView = true
@@ -83,8 +83,15 @@ struct BarcodeView: View {
                 }
             }
         }
+        .toolbar {
+            Button {
+                isShowingHelpView = true
+            } label: {
+                Image(systemName: "questionmark.circle")
+            }
+        }
         .sheet(isPresented: $isShowingBarcodeSetupView) {
-            BarcodeSetupView(isShowing: $isShowingBarcodeSetupView, inputCode: $savedCode)
+            BarcodeSetupView1(isShowing: $isShowingBarcodeSetupView, savedCode: $savedCode)
         }
         .sheet(isPresented: $isShowingHelpView) {
             HelpView()
@@ -105,7 +112,71 @@ struct BarcodeView: View {
     }
 }
 
-struct BarcodeSetupView: View {
+struct BarcodeSetupView1: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    @Binding var isShowing: Bool
+    @Binding var savedCode: String?
+    
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Text("학생증 시작하기")
+                    .font(.system(.largeTitle, weight: .bold))
+                
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "person.text.rectangle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.accent)
+                            .frame(width: 50, height: 50)
+                        Text("학생증의 증명사진 밑에 있는 코드를 입력해 주세요.")
+                    }
+                    
+                    HStack(spacing: 16) {
+                        Image(systemName: "person.slash.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(.accent)
+                            .frame(width: 50, height: 50)
+                        Text("학생증 코드는 한 번 등록하면 변경할 수 없습니다.")
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                Spacer()
+                
+                NavigationLink {
+                    BarcodeSetupView2(isShowing: $isShowing, inputCode: $savedCode)
+                } label: {
+                    Text("시작하기")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, maxHeight: 35)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.bottom)
+                .padding(.bottom)
+                .padding(.bottom)
+            }
+            .padding(.horizontal)
+            .padding(.horizontal)
+            .toolbar {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("취소")
+                }
+            }
+            .frame(maxWidth: 450)
+        }
+    }
+}
+
+struct BarcodeSetupView2: View {
     @Environment(\.dismiss) private var dismiss
     
     @Binding var isShowing: Bool
@@ -125,31 +196,14 @@ struct BarcodeSetupView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Text("학생증 시작하기")
+                Text("학생증 코드 입력")
                     .font(.system(.largeTitle, weight: .bold))
                 
                 Spacer()
                 
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(spacing: 16) {
-                        Image(systemName: "person.text.rectangle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.accent)
-                            .frame(width: 50, height: 50)
-                        Text("학생증의 증명사진 밑에 있는 코드를 입력해 주세요.")
-                        
-                    }
-                    HStack(spacing: 16) {
-                        Image(systemName: "person.slash.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.accent)
-                            .frame(width: 50, height: 50)
-                        Text("학생증 코드는 한 번 등록하면 변경할 수 없습니다.")
-                    }
-                }
-                .padding(.horizontal)
+                Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
                 
                 Spacer()
                 
@@ -194,7 +248,7 @@ struct BarcodeSetupView: View {
                         HapticManager.instance.notification(notificationType: .success)
                     }
                 } label: {
-                    Text("계속")
+                    Text("완료")
                         .font(.headline)
                         .frame(maxWidth: .infinity, maxHeight: 35)
                 }
@@ -209,7 +263,7 @@ struct BarcodeSetupView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
+                    Text("취소")
                 }
             }
             .frame(maxWidth: 450)
@@ -237,7 +291,6 @@ struct HelpView: View {
                     Text("학생증 코드는 개발자에게 문의해야만 변경할 수 있습니다.")
                     
                     Divider()
-                        .padding(.vertical)
                     
                     Text("바코드 인식이 안 될 경우")
                         .font(.headline)

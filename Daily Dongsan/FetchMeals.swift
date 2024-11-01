@@ -32,7 +32,6 @@ func fetchMeals(date: Date) async throws -> [Meal] {
         
         fetchedMeals.append(Meal(id: "2", mealTime: "중식", name: mealName, calorie: calorie))
     } catch {
-        print(error.localizedDescription)
         fetchedMeals.append(Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""))
     }
     
@@ -60,7 +59,6 @@ func fetchMeals(date: Date) async throws -> [Meal] {
             
             fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: ""))
         } catch {
-            print(error.localizedDescription)
         }
     }
     

@@ -39,8 +39,6 @@ struct SettingsView: View {
                             }
                         }
                     }
-                } footer: {
-                    Text("평일에만 알림이 울립니다.")
                 }
                 
                 Section {
