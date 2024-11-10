@@ -9,33 +9,107 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
     @State var resetBarcode: Bool = UserDefaults.standard.bool(forKey: "resetBarcode")
     
     @State private var isShowingBarcodeResetView: Bool = false
     
     var body: some View {
-        TabView() {
-            Tab("홈", systemImage: "house") {
+        if #available(iOS 18, *) {
+            TabView() {
+//                                Tab("홈", systemImage: "house") {
+//                                    HomeView()
+//                                }
+//                                Tab("식단", systemImage: "calendar") {
+//                                    MealsView()
+//                                }
+//                                Tab("학생증", systemImage: "person.text.rectangle") {
+//                                    BarcodeView()
+//                                }
+                
                 HomeView()
-            }
-            Tab("식단", systemImage: "calendar") {
+                    .tabItem {
+                        Image(systemName: "house")
+                        Text("홈")
+                    }
                 MealsView()
-            }
-            Tab("학생증", systemImage: "person.text.rectangle") {
+                    .tabItem {
+                        Image(systemName: "calendar")
+                        Text("식단")
+                    }
                 BarcodeView()
+                    .tabItem {
+                        Image(systemName: "person.text.rectangle")
+                        Text("학생증")
+                    }
             }
-        }
-        .tabViewStyle(.sidebarAdaptable)
-        .onAppear {
-            if resetBarcode {
-                isShowingBarcodeResetView = true
+            .tabViewStyle(.sidebarAdaptable)
+            .onAppear {
+                if resetBarcode {
+                    isShowingBarcodeResetView = true
+                }
             }
+            .sheet(isPresented: $isShowingBarcodeResetView, onDismiss: {
+                UserDefaults.standard.set(false, forKey: "resetBarcode")
+            }, content: {
+                BarcodeResetView(resetBarcode: $resetBarcode)
+            })
+        } else {
+            Group {
+                if horizontalSizeClass == .regular {
+                    NavigationSplitView {
+                        List {
+                            NavigationLink {
+                                HomeView()
+                            } label: {
+                                Label("홈", systemImage: "house")
+                            }
+                            NavigationLink {
+                                MealsView()
+                            } label: {
+                                Label("식단", systemImage: "calendar")
+                            }
+                            NavigationLink {
+                                BarcodeView()
+                            } label: {
+                                Label("학생증", systemImage: "person.text.rectangle")
+                            }
+                        }
+                    } detail: {
+                        HomeView()
+                    }
+                } else {
+                    TabView() {
+                        HomeView()
+                            .tabItem {
+                                Image(systemName: "house")
+                                Text("홈")
+                            }
+                        MealsView()
+                            .tabItem {
+                                Image(systemName: "calendar")
+                                Text("식단")
+                            }
+                        BarcodeView()
+                            .tabItem {
+                                Image(systemName: "person.text.rectangle")
+                                Text("학생증")
+                            }
+                    }
+                }
+            }
+            .onAppear {
+                if resetBarcode {
+                    isShowingBarcodeResetView = true
+                }
+            }
+            .sheet(isPresented: $isShowingBarcodeResetView, onDismiss: {
+                UserDefaults.standard.set(false, forKey: "resetBarcode")
+            }, content: {
+                BarcodeResetView(resetBarcode: $resetBarcode)
+            })
         }
-        .sheet(isPresented: $isShowingBarcodeResetView, onDismiss: {
-            UserDefaults.standard.set(false, forKey: "resetBarcode")
-        }, content: {
-            BarcodeResetView(resetBarcode: $resetBarcode)
-        })
     }
 }
 

@@ -30,30 +30,32 @@ struct HomeView: View {
                 if !isConnected {
                     OfflineView()
                 } else {
-                    if announcement != "" {
-                        HStack {
-                            Label {
-                                Text(announcement)
-                                Spacer()
-                            } icon: {
-                                Image(systemName: "megaphone.fill")
+                    VStack {
+                        if !announcement.isEmpty {
+                            HStack {
+                                Label {
+                                    Text(announcement)
+                                    Spacer()
+                                } icon: {
+                                    Image(systemName: "megaphone.fill")
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .foregroundColor(.secondary)
+                                        .opacity(0.2)
+                                )
                             }
                             .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .foregroundColor(.secondary)
-                                    .opacity(0.25)
-                            )
                         }
-                        .padding()
-                    }
-                    
-                    Group {
-                        if horizontalSizeClass == .regular {
-                            RegularHomeView(meals: meals, currentDate: currentDateString())
-                        } else {
-                            CompactHomeView(meals: meals, currentDate: currentDateString())
+                        
+                        Group {
+                            if horizontalSizeClass == .regular {
+                                RegularHomeView(meals: meals, currentDate: currentDateString())
+                            } else {
+                                CompactHomeView(meals: meals, currentDate: currentDateString())
+                            }
                         }
                     }
                     .navigationTitle("홈")

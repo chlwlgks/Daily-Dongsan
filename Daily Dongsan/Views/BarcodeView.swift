@@ -23,57 +23,65 @@ struct BarcodeView: View {
     
     var body: some View {
         NavigationStack {
-            if let savedCode {
-                GeometryReader { geometry in
-                    let barwidth = geometry.size.width / 130
-                    let barheight = barwidth * 35
-                    
-                    VStack {
-                        HStack(spacing: 0) {
-                            ForEach(Array(generateCode39(input: savedCode)), id: \.self) { bar in
-                                Rectangle()
-                                    .fill(bar == "1" ? Color.black : Color.white)
-                                    .frame(width: barwidth, height: barheight)
+            VStack {
+                if let savedCode {
+                    GeometryReader { geometry in
+                        let barwidth = geometry.size.width / 130
+                        let barheight = barwidth * 35
+                        
+                        VStack {
+                            HStack(spacing: 0) {
+                                ForEach(Array(generateCode39(input: savedCode)), id: \.self) { bar in
+                                    Rectangle()
+                                        .fill(bar == "1" ? Color.black : Color.white)
+                                        .frame(width: barwidth, height: barheight)
+                                }
                             }
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.white)
+                            )
+                            
+                            Text(savedCode)
+                            
+                            Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
+                                .multilineTextAlignment(.center)
+                                .padding(.top)
+                                .padding(.top)
+                                .padding(.top)
+                            
                         }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.white)
-                        )
-                        
-                        Text(savedCode)
-                        
-                        Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
-                            .multilineTextAlignment(.center)
-                            .padding(.top)
-                            .padding(.top)
-                            .padding(.top)
-                        
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .padding()
-                .navigationTitle("학생증")
-            } else {
-                Button {
-                    isShowingBarcodeSetupView = true
-                } label: {
-                    Text("학생증 시작하기")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: 50)
-                        .background {
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundStyle(.accent)
+                    .padding()
+                    .toolbar {
+                        Button {
+                            isShowingHelpView = true
+                        } label: {
+                            Image(systemName: "questionmark.circle")
                         }
+                    }
+                } else {
+                    Button {
+                        isShowingBarcodeSetupView = true
+                    } label: {
+                        Text("학생증 시작하기")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: 50)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundStyle(.accent)
+                            }
+                    }
+                    .padding(.horizontal)
+                    .padding(.horizontal)
+                    .frame(maxWidth: 450)
                 }
-                .navigationTitle("학생증")
-                .padding(.horizontal)
-                .padding(.horizontal)
-                .frame(maxWidth: 450)
             }
+            .navigationTitle("학생증")
         }
         .onAppear {
             savedCode = UserDefaults.standard.string(forKey: "savedCode")
@@ -83,15 +91,8 @@ struct BarcodeView: View {
                 }
             }
         }
-        .toolbar {
-            Button {
-                isShowingHelpView = true
-            } label: {
-                Image(systemName: "questionmark.circle")
-            }
-        }
         .sheet(isPresented: $isShowingBarcodeSetupView) {
-            BarcodeSetupView1(isShowing: $isShowingBarcodeSetupView, savedCode: $savedCode)
+            BarcodeStartView(isShowing: $isShowingBarcodeSetupView, savedCode: $savedCode)
         }
         .sheet(isPresented: $isShowingHelpView) {
             HelpView()
@@ -112,7 +113,7 @@ struct BarcodeView: View {
     }
 }
 
-struct BarcodeSetupView1: View {
+struct BarcodeStartView: View {
     @Environment(\.dismiss) private var dismiss
     
     @Binding var isShowing: Bool
@@ -133,11 +134,11 @@ struct BarcodeSetupView1: View {
                             .scaledToFit()
                             .foregroundStyle(.accent)
                             .frame(width: 50, height: 50)
-                        Text("학생증의 증명사진 밑에 있는 코드를 입력해 주세요.")
+                        Text("학생증의 증명사진 밑에 있는 숫자 코드를 입력해 주세요. 'DS'는 입력하지 않아도 돼요.")
                     }
                     
                     HStack(spacing: 16) {
-                        Image(systemName: "person.slash.fill")
+                        Image(systemName: "lock.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundStyle(.accent)
@@ -194,80 +195,78 @@ struct BarcodeSetupView2: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                Text("학생증 코드 입력")
-                    .font(.system(.largeTitle, weight: .bold))
-                
-                Spacer()
-                
-                Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                Spacer()
-                
-                Group {
-                    VStack {
-                        HStack(spacing: 16) {
-                            Text("DS")
-                            TextField("학생증 코드", text: $temporaryCode)
-                                .padding()
-                                .frame(maxWidth: .infinity, maxHeight: 50)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.secondary)
-                                }
-                                .keyboardType(.numberPad)
-                                .onChange(of: temporaryCode, { oldValue, newValue in
-                                    if newValue.count > 5 {
-                                        temporaryCode = String(newValue.prefix(5))
-                                    }
-                                })
-                                .onSubmit {
-                                    validateCode()
-                                }
-                        }
-                        if !isValid {
-                            Text("학생증 코드는 5자리 숫자여야 합니다.")
-                                .foregroundStyle(.red)
-                        }
-                    }
-                }
+        VStack {
+            Text("학생증 코드 입력")
+                .font(.system(.largeTitle, weight: .bold))
+            
+            Spacer()
+            
+            Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
+                .multilineTextAlignment(.center)
                 .padding(.horizontal)
-                
-                Spacer()
-                Spacer()
-                
-                Button {
-                    validateCode()
-                    if isValid {
-                        inputCode = "DS" + temporaryCode
-                        UserDefaults.standard.set(inputCode, forKey: "savedCode")
-                        isShowing = false
-                        HapticManager.instance.notification(notificationType: .success)
+            
+            Spacer()
+            
+            Group {
+                VStack {
+                    HStack(spacing: 16) {
+                        Text("DS")
+                        TextField("학생증 코드", text: $temporaryCode)
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: 50)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.secondary)
+                            }
+                            .keyboardType(.numberPad)
+                            .onChange(of: temporaryCode) { newValue in
+                                if newValue.count > 5 {
+                                    temporaryCode = String(newValue.prefix(5))
+                                }
+                            }
+                            .onSubmit {
+                                validateCode()
+                            }
                     }
-                } label: {
-                    Text("완료")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, maxHeight: 35)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.bottom)
-                .padding(.bottom)
-                .padding(.bottom)
-            }
-            .padding(.horizontal)
-            .padding(.horizontal)
-            .toolbar {
-                Button {
-                    dismiss()
-                } label: {
-                    Text("취소")
+                    if !isValid {
+                        Text("학생증 코드는 5자리 숫자여야 합니다.")
+                            .foregroundStyle(.red)
+                    }
                 }
             }
-            .frame(maxWidth: 450)
+            .padding(.horizontal)
+            
+            Spacer()
+            Spacer()
+            
+            Button {
+                validateCode()
+                if isValid {
+                    inputCode = "DS" + temporaryCode
+                    UserDefaults.standard.set(inputCode, forKey: "savedCode")
+                    isShowing = false
+                    HapticManager.instance.notification(notificationType: .success)
+                }
+            } label: {
+                Text("완료")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, maxHeight: 35)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.bottom)
+            .padding(.bottom)
+            .padding(.bottom)
         }
+        .padding(.horizontal)
+        .padding(.horizontal)
+        .toolbar {
+            Button {
+                isShowing = false
+            } label: {
+                Text("취소")
+            }
+        }
+        .frame(maxWidth: 450)
     }
     
     private func validateCode() {
@@ -295,11 +294,12 @@ struct HelpView: View {
                     Text("바코드 인식이 안 될 경우")
                         .font(.headline)
                     Text("· 밝기를 올려 주세요.")
-                    Text("· 바코드를 충분히 가까이 대주세요.")
+                    Text("· 바코드를 가까이 대주세요.")
                 }
                 .padding()
             }
             .navigationTitle("학생증 도움말")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 Button {
                     dismiss()

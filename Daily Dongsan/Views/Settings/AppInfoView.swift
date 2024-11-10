@@ -16,7 +16,7 @@ struct AppInfoView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                Image("Daily_Dongsan")
+                Image("Daily Dongsan")
                     .resizable()
                     .scaledToFit()
                     .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -34,6 +34,7 @@ struct AppInfoView: View {
             }
             .padding()
             .navigationTitle("앱 정보")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

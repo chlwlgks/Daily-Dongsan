@@ -47,7 +47,7 @@ struct MealsView: View {
                     meals = try await fetchMeals(date: selectedDate)
                 }
             }
-            .onChange(of: selectedDate) {
+            .onChange(of: selectedDate) { _ in
                 Task {
                     meals = try await fetchMeals(date: selectedDate)
                 }
@@ -192,10 +192,12 @@ private struct AllergyView: View {
         NavigationStack {
             List(allergyData) { allergy in
                 if allergy.id == "20" {
-                    NavigationLink {
-                        ParkJunWooView()
-                    } label: {
-                        Text("\(allergy.id). \(allergy.name)")
+                    if #available(iOS 17, *) {
+                        NavigationLink {
+                            ParkJunWooView()
+                        } label: {
+                            Text("\(allergy.id). \(allergy.name)")
+                        }
                     }
                 } else {
                     Text("\(allergy.id). \(allergy.name)")

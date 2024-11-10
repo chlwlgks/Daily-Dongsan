@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 17, *)
 struct ParkJunWooView: View {
     var body: some View {
         NavigationStack {
@@ -65,5 +66,7 @@ struct ItemPhoto: View {
 }
 
 #Preview {
-    ParkJunWooView()
+    if #available(iOS 17, *) {
+        ParkJunWooView()
+    }
 }

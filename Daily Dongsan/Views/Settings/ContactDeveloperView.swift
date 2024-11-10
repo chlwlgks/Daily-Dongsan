@@ -40,6 +40,7 @@ struct ContactDeveloperView: View {
                 }
             }
             .navigationTitle("개발자에게 문의하기")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

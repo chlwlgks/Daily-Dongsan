@@ -48,10 +48,13 @@ struct SettingsView: View {
                         Label {
                             Text("개인정보 처리방침")
                         } icon: {
-                            IconView(foregroundStyle: Color.gray, systemImage: "text.document.fill")
+                            if #available(iOS 18, *) {
+                                IconView(foregroundStyle: Color.gray, systemImage: "text.page.fill")
+                            } else {
+                                IconView(foregroundStyle: Color.gray, systemImage: "text.book.closed.fill")
+                            }
                         }
                     }
-                    .foregroundStyle(.foreground)
                     
                     NavigationLink {
                         ContactDeveloperView()

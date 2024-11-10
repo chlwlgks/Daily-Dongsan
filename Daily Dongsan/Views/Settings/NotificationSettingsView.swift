@@ -26,11 +26,11 @@ struct NotificationSettingsView: View {
                     }
                     DatePicker("시간", selection: $breakfastTime, displayedComponents: .hourAndMinute)
                 }
-                .onChange(of: breakfastNotification) { oldValue, newValue in
+                .onChange(of: breakfastNotification) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "breakfastNotification")
                     handleNotificationChange(meal: "조식", notificationEnabled: newValue, time: breakfastTime)
                 }
-                .onChange(of: breakfastTime) { oldValue, newValue in
+                .onChange(of: breakfastTime) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "breakfastTime")
                     handleNotificationChange(meal: "조식", notificationEnabled: breakfastNotification, time: newValue)
                 }
@@ -41,11 +41,11 @@ struct NotificationSettingsView: View {
                     }
                     DatePicker("시간", selection: $lunchTime, displayedComponents: .hourAndMinute)
                 }
-                .onChange(of: lunchNotification) { oldValue, newValue in
+                .onChange(of: lunchNotification) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "lunchNotification")
                     handleNotificationChange(meal: "중식", notificationEnabled: newValue, time: lunchTime)
                 }
-                .onChange(of: lunchTime) { oldValue, newValue in
+                .onChange(of: lunchTime) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "lunchTime")
                     handleNotificationChange(meal: "중식", notificationEnabled: lunchNotification, time: newValue)
                 }
@@ -56,16 +56,17 @@ struct NotificationSettingsView: View {
                     }
                     DatePicker("시간", selection: $dinnerTime, displayedComponents: .hourAndMinute)
                 }
-                .onChange(of: dinnerNotification) { oldValue, newValue in
+                .onChange(of: dinnerNotification) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "dinnerNotification")
                     handleNotificationChange(meal: "석식", notificationEnabled: newValue, time: dinnerTime)
                 }
-                .onChange(of: dinnerTime) { oldValue, newValue in
+                .onChange(of: dinnerTime) { newValue in
                     UserDefaults.standard.set(newValue, forKey: "dinnerTime")
                     handleNotificationChange(meal: "석식", notificationEnabled: dinnerNotification, time: newValue)
                 }
             }
             .navigationTitle("알림")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 breakfastNotification = UserDefaults.standard.bool(forKey: "breakfastNotification")
                 breakfastTime = (UserDefaults.standard.object(forKey: "breakfastTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
