@@ -8,7 +8,7 @@
 import SwiftUI
 import Network
 
-struct MealsView: View {
+struct MealPlanView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     @State private var isConnected: Bool = true
@@ -191,17 +191,7 @@ private struct AllergyView: View {
     var body: some View {
         NavigationStack {
             List(allergyData) { allergy in
-                if allergy.id == "20" {
-                    if #available(iOS 17, *) {
-                        NavigationLink {
-                            ParkJunWooView()
-                        } label: {
-                            Text("\(allergy.id). \(allergy.name)")
-                        }
-                    }
-                } else {
                     Text("\(allergy.id). \(allergy.name)")
-                }
             }
             .navigationTitle("알레르기 유발 식품")
             .navigationBarTitleDisplayMode(.inline)
@@ -218,5 +208,5 @@ private struct AllergyView: View {
 }
 
 #Preview {
-    MealsView()
+    MealPlanView()
 }

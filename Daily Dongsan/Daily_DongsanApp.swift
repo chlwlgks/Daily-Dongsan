@@ -19,10 +19,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct Daily_DongsanApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @AppStorage("showOnboardingView") private var showOnboardingView = true
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .sheet(isPresented: $showOnboardingView) {
+                    OnboardingView()
+                        .interactiveDismissDisabled()
+                }
         }
     }
 }

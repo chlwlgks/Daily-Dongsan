@@ -11,25 +11,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C4F1CABD2C955E9A0031BB29 /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C44814CE2DA80AA2000BA52F /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Daily Dongsan.app"; path = "/Users/jihan/Documents/development/Xcode/Daily Dongsan/build/Debug-iphoneos/Daily Dongsan.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C4AED5C02CD26AA5003F4566 /* Exceptions for "Daily Dongsan" folder in "Daily Dongsan" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Config.xcconfig,
-			);
-			target = C4F1CABC2C955E9A0031BB29 /* Daily Dongsan */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C4F1CABF2C955E9A0031BB29 /* Daily Dongsan */ = {
+		C473E4042DA809C500F92FE5 /* Daily Dongsan */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C4AED5C02CD26AA5003F4566 /* Exceptions for "Daily Dongsan" folder in "Daily Dongsan" target */,
-			);
 			path = "Daily Dongsan";
 			sourceTree = "<group>";
 		};
@@ -50,17 +37,8 @@
 		C4F1CAB42C955E9A0031BB29 = {
 			isa = PBXGroup;
 			children = (
-				C4F1CABF2C955E9A0031BB29 /* Daily Dongsan */,
-				C4F1CABE2C955E9A0031BB29 /* Products */,
+				C473E4042DA809C500F92FE5 /* Daily Dongsan */,
 			);
-			sourceTree = "<group>";
-		};
-		C4F1CABE2C955E9A0031BB29 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				C4F1CABD2C955E9A0031BB29 /* Daily Dongsan.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -79,14 +57,14 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C4F1CABF2C955E9A0031BB29 /* Daily Dongsan */,
+				C473E4042DA809C500F92FE5 /* Daily Dongsan */,
 			);
 			name = "Daily Dongsan";
 			packageProductDependencies = (
 				C47B1E782CBA2079007309E6 /* FirebaseFirestore */,
 			);
 			productName = "Daily Dongsan";
-			productReference = C4F1CABD2C955E9A0031BB29 /* Daily Dongsan.app */;
+			productReference = C44814CE2DA80AA2000BA52F /* Daily Dongsan.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -97,7 +75,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					C4F1CABC2C955E9A0031BB29 = {
 						CreatedOnToolsVersion = 16.0;
@@ -117,7 +95,7 @@
 				C47B1E772CBA2079007309E6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = C4F1CABE2C955E9A0031BB29 /* Products */;
+			productRefGroup = C4F1CAB42C955E9A0031BB29;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -182,6 +160,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -245,6 +224,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -274,7 +254,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Daily Dongsan/Preview Content\"";
-				DEVELOPMENT_TEAM = YHRCW4MAA9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Daily-Dongsan-Info.plist";
@@ -285,12 +264,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jihani.Daily-Dongsan";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -312,7 +291,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Daily Dongsan/Preview Content\"";
-				DEVELOPMENT_TEAM = YHRCW4MAA9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Daily-Dongsan-Info.plist";
@@ -323,12 +301,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jihani.Daily-Dongsan";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;

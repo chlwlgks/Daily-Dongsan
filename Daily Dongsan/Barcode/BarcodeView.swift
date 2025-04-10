@@ -1,0 +1,104 @@
+//
+//  BarcodeView.swift
+//  Daily Dongsan
+//
+//  Created by 최지한 on 10/10/24.
+//
+
+import SwiftUI
+import SwiftData
+
+struct BarcodeView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    @AppStorage("studentID") private var studentID: String?
+    
+    @StateObject private var viewModel = BarcodeViewModel()
+    
+    @State private var isShowingBarcodeSetupView = false
+    @State private var isShowingHelpView: Bool = false
+    
+    var body: some View {
+        NavigationStack {
+            VStack {
+                if let studentID {
+                    GeometryReader { geometry in
+                        let barwidth = geometry.size.width / 130
+                        let barheight = barwidth * 35
+                        
+                        VStack {
+                            HStack(spacing: 0) {
+                                ForEach(Array(viewModel.generateCode39(input: studentID)), id: \.self) { bar in
+                                    Rectangle()
+                                        .fill(bar == "1" ? Color.black : Color.white)
+                                        .frame(width: barwidth, height: barheight)
+                                }
+                            }
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.white)
+                            )
+                            
+                            Text(studentID)
+                            
+                            Text("학생증 도용 시 안산동산고등학교 학생 생활 교육규정 제12조에 따라 학생 생활교육을 받을 수 있습니다.")
+                                .multilineTextAlignment(.center)
+                                .padding(.top)
+                                .padding(.top)
+                                .padding(.top)
+                            
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .padding()
+                    .toolbar {
+                        Button {
+                            isShowingHelpView = true
+                        } label: {
+                            Image(systemName: "questionmark.circle")
+                        }
+                    }
+                } else {
+                    Button {
+                        isShowingBarcodeSetupView = true
+                    } label: {
+                        Text("학생증 시작하기")
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity, maxHeight: 35)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.horizontal)
+                    .padding(.horizontal)
+                }
+            }
+            .navigationTitle("학생증")
+        }
+        .onAppear {
+            if studentID == nil {
+                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                    isShowingBarcodeSetupView = true
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingBarcodeSetupView) {
+            NavigationStack {
+                BarcodeSetupView()
+                    .toolbar {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("취소")
+                        }
+                    }
+            }
+            .sheet(isPresented: $isShowingHelpView) {
+                BarcodeHelpView()
+            }
+        }
+    }
+}
+    
+    #Preview {
+        BarcodeView()
+    }

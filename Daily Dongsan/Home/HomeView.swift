@@ -77,7 +77,7 @@ struct HomeView: View {
                 }
             }
             .sheet(isPresented: $isShowingSettingsView) {
-                SettingsView()
+                MoreView()
             }
         }
     }
