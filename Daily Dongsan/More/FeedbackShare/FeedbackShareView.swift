@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContactDeveloperView: View {
+struct FeedbackShareView: View {
     var body: some View {
         List {
             Section("Instagram") {
@@ -33,11 +33,11 @@ struct ContactDeveloperView: View {
                 }
             }
         }
-        .navigationTitle("개발자에게 문의하기")
+        .navigationTitle("피드백 공유")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    ContactDeveloperView()
+    FeedbackShareView()
 }

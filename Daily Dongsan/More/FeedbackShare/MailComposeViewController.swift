@@ -26,7 +26,7 @@ class MailComposeViewController: NSObject, MFMailComposeViewControllerDelegate {
             let modelIdentifier = identifier + String(UnicodeScalar(UInt8(value)))
             return modelIdentifier
         }
-        return ModelName(modelIdentifier)
+        return ModelName(for: modelIdentifier)
     }
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
     
@@ -63,7 +63,7 @@ class MailComposeViewController: NSObject, MFMailComposeViewControllerDelegate {
         (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController
     }
     
-    func ModelName(_ identifier: String) -> String {
+    func ModelName(for identifier: String) -> String {
         switch identifier {
 // MARK: - iPhone
         case "iPhone11,2":                                      return "iPhone XS"

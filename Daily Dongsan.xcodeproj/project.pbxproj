@@ -10,11 +10,41 @@
 		C47B1E792CBA2079007309E6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C47B1E782CBA2079007309E6 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C43037C42DA88A4300E415F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C4F1CAB52C955E9A0031BB29 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C43037C12DA88A4300E415F6;
+			remoteInfo = "Daily Dongsan Watch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C43037D02DA88A4400E415F6 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		C44814CE2DA80AA2000BA52F /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Daily Dongsan.app"; path = "/Users/jihan/Documents/development/Xcode/Daily Dongsan/build/Debug-iphoneos/Daily Dongsan.app"; sourceTree = "<absolute>"; };
+		C471A8832DC24FF600AFF503 /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Daily Dongsan Watch Watch App";
+			sourceTree = "<group>";
+		};
 		C473E4042DA809C500F92FE5 /* Daily Dongsan */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Daily Dongsan";
@@ -23,6 +53,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C43037BF2DA88A4300E415F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C4F1CABA2C955E9A0031BB29 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -38,12 +75,57 @@
 			isa = PBXGroup;
 			children = (
 				C473E4042DA809C500F92FE5 /* Daily Dongsan */,
+				C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */,
+				C471A8832DC24FF600AFF503 /* Daily Dongsan.app */,
+				C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */,
+				C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C43037BC2DA88A4300E415F6 /* Daily Dongsan Watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C43037D12DA88A4400E415F6 /* Build configuration list for PBXNativeTarget "Daily Dongsan Watch" */;
+			buildPhases = (
+				C43037BB2DA88A4300E415F6 /* Resources */,
+				C43037D02DA88A4400E415F6 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C43037C52DA88A4300E415F6 /* PBXTargetDependency */,
+			);
+			name = "Daily Dongsan Watch";
+			packageProductDependencies = (
+			);
+			productName = "Daily Dongsan Watch";
+			productReference = C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		C43037C12DA88A4300E415F6 /* Daily Dongsan Watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C43037CD2DA88A4400E415F6 /* Build configuration list for PBXNativeTarget "Daily Dongsan Watch Watch App" */;
+			buildPhases = (
+				C43037BE2DA88A4300E415F6 /* Sources */,
+				C43037BF2DA88A4300E415F6 /* Frameworks */,
+				C43037C02DA88A4300E415F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */,
+			);
+			name = "Daily Dongsan Watch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "Daily Dongsan Watch Watch App";
+			productReference = C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 		C4F1CABC2C955E9A0031BB29 /* Daily Dongsan */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C4F1CACD2C955E9B0031BB29 /* Build configuration list for PBXNativeTarget "Daily Dongsan" */;
@@ -64,7 +146,7 @@
 				C47B1E782CBA2079007309E6 /* FirebaseFirestore */,
 			);
 			productName = "Daily Dongsan";
-			productReference = C44814CE2DA80AA2000BA52F /* Daily Dongsan.app */;
+			productReference = C471A8832DC24FF600AFF503 /* Daily Dongsan.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -74,9 +156,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
+				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					C43037BC2DA88A4300E415F6 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					C43037C12DA88A4300E415F6 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					C4F1CABC2C955E9A0031BB29 = {
 						CreatedOnToolsVersion = 16.0;
 					};
@@ -100,11 +188,27 @@
 			projectRoot = "";
 			targets = (
 				C4F1CABC2C955E9A0031BB29 /* Daily Dongsan */,
+				C43037BC2DA88A4300E415F6 /* Daily Dongsan Watch */,
+				C43037C12DA88A4300E415F6 /* Daily Dongsan Watch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C43037BB2DA88A4300E415F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C43037C02DA88A4300E415F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C4F1CABB2C955E9A0031BB29 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +219,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C43037BE2DA88A4300E415F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C4F1CAB92C955E9A0031BB29 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +235,101 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C43037C52DA88A4300E415F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C43037C12DA88A4300E415F6 /* Daily Dongsan Watch Watch App */;
+			targetProxy = C43037C42DA88A4300E415F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C43037CE2DA88A4400E415F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Dongsan Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jihani.Daily-Dongsan-Watch.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Debug;
+		};
+		C43037CF2DA88A4400E415F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Dongsan Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jihani.Daily-Dongsan-Watch.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.4;
+			};
+			name = Release;
+		};
+		C43037D22DA88A4400E415F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Dongsan Watch";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jihani.Daily-Dongsan-Watch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C43037D32DA88A4400E415F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YHRCW4MAA9;
+				INFOPLIST_KEY_CFBundleDisplayName = "Daily Dongsan Watch";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jihani.Daily-Dongsan-Watch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		C4F1CACB2C955E9B0031BB29 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -252,7 +457,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Daily Dongsan/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -275,8 +480,8 @@
 				REGISTER_APP_GROUPS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -289,7 +494,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Daily Dongsan/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -312,8 +517,8 @@
 				REGISTER_APP_GROUPS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -323,6 +528,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C43037CD2DA88A4400E415F6 /* Build configuration list for PBXNativeTarget "Daily Dongsan Watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C43037CE2DA88A4400E415F6 /* Debug */,
+				C43037CF2DA88A4400E415F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C43037D12DA88A4400E415F6 /* Build configuration list for PBXNativeTarget "Daily Dongsan Watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C43037D22DA88A4400E415F6 /* Debug */,
+				C43037D32DA88A4400E415F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C4F1CAB82C955E9A0031BB29 /* Build configuration list for PBXProject "Daily Dongsan" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

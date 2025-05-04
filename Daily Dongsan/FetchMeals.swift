@@ -7,60 +7,135 @@
 
 import FirebaseFirestore
 
-private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
-
-private let mealTimes: [String : String] = ["1" : "조식", "2" : "중식", "3" : "석식"]
-
-func fetchMeals(date: Date) async throws -> [Meal] {
-    var fetchedMeals: [Meal] = []
+class FetchMeals {
+    private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
     
-    let dateformatter = DateFormatter()
-    dateformatter.dateFormat = "yyyyMMdd"
-    let currentDate = dateformatter.string(from: date)
+    private let mealTimes: [String : String] = ["1" : "조식", "2" : "중식", "3" : "석식"]
     
-    let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(currentDate)")!
-    
-    let (data, _) = try await URLSession.shared.data(from: url)
-    
-    let decoder = JSONDecoder()
-    do {
-        let mealResponse = try decoder.decode(Mealresponse.self, from: data)
-        let mealInfo = mealResponse.mealServiceDietInfo[1].row!.first!
+    func fetchMeals(for date: Date) async -> [Meal] {
+//        let date = Calendar.current.date(from: DateComponents(year: 2025, month: 5, day: 15))!
         
-        let mealName = mealInfo.DDISH_NM.replacingOccurrences(of: "<br/>", with: "\n")
-        let calorie = mealInfo.CAL_INFO
+        var meals: [Meal] = [
+            Meal(mealCode: "1", mealType: "조식"),
+            Meal(mealCode: "2", mealType: "중식"),
+            Meal(mealCode: "3", mealType: "석식")
+        ]
         
-        fetchedMeals.append(Meal(id: "2", mealTime: "중식", name: mealName, calorie: calorie))
-    } catch {
-        fetchedMeals.append(Meal(id: "2", mealTime: "중식", name: "급식 정보가 없습니다.", calorie: ""))
-    }
-    
-    for mealTypeCode in ["1", "3"] {
-        let mealTypeName = mealTimes[mealTypeCode]!
+        // MARK: - 조식, 석식
+        for mealCode in ["1", "3"] {
+            let mealType = mealTimes[mealCode]!
+            
+            let db = Firestore.firestore()
+            
+            let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy"
+            let year = yearFormatter.string(from: date)
+            
+            let monthFormatter = DateFormatter()
+            monthFormatter.dateFormat = "MM"
+            let month = monthFormatter.string(from: date)
+            
+            let dayFormatter = DateFormatter()
+            dayFormatter.dateFormat = "d"
+            let day = dayFormatter.string(from: date)
+            
+            do {
+                var mealName = try await db.collection("meals").document(year).collection(month).document(day).getDocument().data()?[mealType] as? String? ?? nil
+                if mealName != nil {
+                    mealName = mealName!.replacingOccurrences(of: ",", with: ".")
+                    mealName = mealName!.replacingOccurrences(of: "\\n", with: "<br/>")
+                    
+                    if let index = meals.firstIndex(where: { $0.mealCode == mealCode }) {
+                        meals[index].menus = parseMeals(from: mealName!)
+                    }
+                }
+            } catch {
+                print("Failed to load meals: \(error.localizedDescription)")
+            }
+        }
         
-        let db = Firestore.firestore()
+// MARK: - 중식
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "yMMdd"
+        let currentDate = dateformatter.string(from: date)
         
-        let yearFormatter = DateFormatter()
-        yearFormatter.dateFormat = "yyyy"
-        let year = yearFormatter.string(from: date)
-        
-        let monthFormatter = DateFormatter()
-        monthFormatter.dateFormat = "MM"
-        let month = monthFormatter.string(from: date)
-        
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "d"
-        let day = dayFormatter.string(from: date)
+        let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(currentDate)")!
         
         do {
-            var mealName = try await db.collection("meals").document(year).collection(month).document(day).getDocument().data()?[mealTypeName] as? String ?? "급식 정보가 없습니다."
-            mealName = mealName.replacingOccurrences(of: ",", with: ".")
-            mealName = mealName.replacingOccurrences(of: "\\n", with: "\n")
+            let (data, _) = try await URLSession.shared.data(from: url)
             
-            fetchedMeals.append(Meal(id: mealTypeCode, mealTime: mealTypeName, name: mealName, calorie: ""))
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(Mealresponse.self, from: data)
+            
+            let rows = response.mealServiceDietInfo[1].row!
+            for row in rows {
+                if let index = meals.firstIndex(where: { $0.mealCode == row.MMEAL_SC_CODE }) {
+                    meals[index].menus = parseMeals(from: row.DDISH_NM)
+                    meals[index].calorieInfo = row.CAL_INFO
+                }
+            }
         } catch {
+            print("Failed to load meals: \(error.localizedDescription)")
         }
+        
+        return meals
     }
     
-    return fetchedMeals.sorted(by: { $0.id < $1.id })
+    func parseMeals(from meal: String) -> [Menu] {
+        var parsedMenus: [Menu] = []
+        
+        let lines = meal.split(separator: "<br/>").compactMap { line in
+            String(line).trimmingCharacters(in: .whitespaces)
+        }
+        for line in lines {
+            var name = line
+            var allergies: Set<String>?
+            
+            if let closeParenIndex = line.lastIndex(of: ")") {
+                var balance = 0
+                var matchingopenParenIndex: String.Index? = nil
+                
+                for i in line.indices[..<closeParenIndex].reversed() {
+                    if line[i] == ")" {
+                        balance += 1
+                    } else if line[i] == "(" {
+                        if balance == 0 {
+                            matchingopenParenIndex = i
+                            break
+                        } else {
+                            balance -= 1
+                        }
+                    }
+                }
+                
+                if let openParenIndex = matchingopenParenIndex {
+                    let inside = String(line[line.index(after: openParenIndex)...line.index(before: closeParenIndex)])
+                    if isAllergyString(in: inside) {
+                        let codes = inside
+                            .components(separatedBy: CharacterSet(charactersIn: ".*"))
+                            .compactMap { part in
+                            return part
+                                    .replacingOccurrences(of: "(", with: "")
+                                    .replacingOccurrences(of: ")", with: "")
+                        }
+                        allergies = Set(codes)
+                        name = String(line[...line.index(before: openParenIndex)]).trimmingCharacters(in: .whitespaces)
+                    }
+                }
+            }
+            
+            parsedMenus.append(Menu(name: name, allergies: allergies))
+        }
+        
+        return parsedMenus
+    }
+    
+    private func isAllergyString(in string: String) -> Bool {
+        for char in string {
+            if !(char.isNumber || char == "." || char == "(" || char == ")" || char == "*") {
+                return false
+            }
+        }
+        return true
+    }
 }

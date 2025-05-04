@@ -8,67 +8,81 @@
 import SwiftUI
 import SwiftData
 
+enum AppTab: String, CaseIterable {
+    case home = "홈"
+    case mealPlan = "식단"
+    case barcode = "학생증"
+    case more = "더보기"
+    
+    var systemImage: String {
+        switch self {
+        case .home: return "house"
+        case .mealPlan: return "calendar"
+        case .barcode: return "person.text.rectangle"
+        case .more: return "ellipsis"
+        }
+    }
+    
+    @ViewBuilder var view: some View {
+        switch self {
+        case .home: HomeView()
+        case .mealPlan: MealPlanView()
+        case .barcode: BarcodeView()
+        case .more: MoreView()
+        }
+    }
+}
+
 struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
+    @State private var selection: AppTab? = .home
+    
     var body: some View {
         if #available(iOS 18, *) {
-            TabView() {
-                Tab("홈", systemImage: "house") {
-                    HomeView()
-                }
-                Tab("식단", systemImage: "calendar") {
-                    MealPlanView()
-                }
-                Tab("학생증", systemImage: "person.text.rectangle") {
-                    BarcodeView()
-                }
-                Tab("더보기", systemImage: "ellipsis") {
-                    MoreView()
+            TabView(selection: $selection) {
+                ForEach(AppTab.allCases, id: \.self) { tab in
+                    Tab(tab.rawValue, systemImage: tab.systemImage, value: tab) {
+                        tab.view
+                    }
                 }
             }
             .tabViewStyle(.sidebarAdaptable)
+            .tabViewSidebarHeader {
+                HStack {
+                    Text("데일리 동산")
+                        .font(.system(.largeTitle, weight: .bold))
+                    Spacer()
+                }
+            }
         } else {
-            Group {
-                if horizontalSizeClass == .regular {
-                    NavigationSplitView {
-                        List {
-                            NavigationLink {
-                                HomeView()
-                            } label: {
-                                Label("홈", systemImage: "house")
-                            }
-                            NavigationLink {
-                                MealPlanView()
-                            } label: {
-                                Label("식단", systemImage: "calendar")
-                            }
-                            NavigationLink {
-                                BarcodeView()
-                            } label: {
-                                Label("학생증", systemImage: "person.text.rectangle")
-                            }
-                        }
-                    } detail: {
-                        HomeView()
+            if horizontalSizeClass == .regular {
+                NavigationSplitView {
+                    List(AppTab.allCases, id: \.self, selection: $selection) { tab in
+                        Label(tab.rawValue, systemImage: tab.systemImage)
                     }
-                } else {
-                    TabView() {
+                    .navigationTitle("데일리 동산")
+                } detail: {
+                    switch selection! {
+                    case .home:
                         HomeView()
-                            .tabItem {
-                                Image(systemName: "house")
-                                Text("홈")
-                            }
+                    case .mealPlan:
                         MealPlanView()
-                            .tabItem {
-                                Image(systemName: "calendar")
-                                Text("식단")
-                            }
+                    case .barcode:
                         BarcodeView()
+                    case .more:
+                        MoreView()
+                    }
+                }
+            } else {
+                TabView(selection: $selection) {
+                    ForEach(AppTab.allCases, id: \.self) { tab in
+                        tab.view
                             .tabItem {
-                                Image(systemName: "person.text.rectangle")
-                                Text("학생증")
+                                Image(systemName: tab.systemImage)
+                                Text(tab.rawValue)
                             }
+                            .tag(tab)
                     }
                 }
             }

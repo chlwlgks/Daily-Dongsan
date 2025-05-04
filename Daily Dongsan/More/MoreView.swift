@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MoreView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
 //    @State private var breakfastNotification: Bool = UserDefaults.standard.bool(forKey: "breakfastNotification")
 //    @State private var lunchNotification: Bool = UserDefaults.standard.bool(forKey: "lunchNotification")
 //    @State private var dinnerNotification: Bool = UserDefaults.standard.bool(forKey: "dinnerNotification")
@@ -49,7 +51,7 @@ struct MoreView: View {
                 
                 Section {
                     NavigationLink {
-                        ContactDeveloperView()
+                        FeedbackShareView()
                     } label: {
                         Text("피드백 공유")
                     }

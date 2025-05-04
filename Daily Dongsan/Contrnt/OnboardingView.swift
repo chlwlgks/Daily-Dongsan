@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -50,7 +52,7 @@ struct OnboardingView: View {
                         VStack {
                             Spacer()
                             Button {
-                                
+                                dismiss()
                             } label: {
                                 Text("지금 안 함")
                                     .fontWeight(.semibold)

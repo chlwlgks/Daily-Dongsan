@@ -15,7 +15,6 @@ struct AllergySelectionView: View {
             Button {
                 viewModel.toggleSelection(for: allergy.id)
                 HapticManager().selection()
-                print(viewModel.selectedAllergies)
             } label: {
                 HStack {
                     Text("\(allergy.id). \(allergy.name)")
@@ -26,7 +25,9 @@ struct AllergySelectionView: View {
                             .fontWeight(.semibold)
                     }
                 }
-                .contentShape(Rectangle())
+                .contentShape(
+                    Rectangle()
+                )
             }
             .buttonStyle(.plain)
         }

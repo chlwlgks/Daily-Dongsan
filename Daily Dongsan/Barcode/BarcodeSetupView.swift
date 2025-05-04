@@ -47,7 +47,7 @@ struct BarcodeSetupView: View {
                             input = String(filtered.prefix(5))
                         }
                         .onSubmit {
-                            viewModel.validateCode(input)
+                            viewModel.validateCode(code: input)
                         }
                 }
                 Text("학생증 코드는 5자리 숫자여야 합니다.")
@@ -60,7 +60,7 @@ struct BarcodeSetupView: View {
             Spacer()
             
             Button {
-                viewModel.validateCode(input)
+                viewModel.validateCode(code: input)
                 if viewModel.isValid {
                     studentID = "DS" + input
                     dismiss()

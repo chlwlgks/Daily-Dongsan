@@ -17,7 +17,7 @@ class BarcodeViewModel: ObservableObject {
         "*": "100101101101"
     ]
     
-    func generateCode39(input: String) -> String {
+    func generateCode39(from input: String) -> String {
         var code39 = code39Patterns["*"]! + "0"
         
         for character in input {
@@ -32,8 +32,8 @@ class BarcodeViewModel: ObservableObject {
     
     @Published var isValid = true
     
-    func validateCode(_ temporaryCode: String) {
-        if temporaryCode.count == 5 && temporaryCode.allSatisfy(\.isNumber) {
+    func validateCode(code: String) {
+        if code.count == 5 && code.allSatisfy(\.isNumber) {
             isValid = true
         } else {
             isValid = false

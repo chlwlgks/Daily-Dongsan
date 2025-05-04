@@ -16,7 +16,6 @@ struct BarcodeView: View {
     @StateObject private var viewModel = BarcodeViewModel()
     
     @State private var isShowingBarcodeSetupView = false
-    @State private var isShowingHelpView: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -28,7 +27,7 @@ struct BarcodeView: View {
                         
                         VStack {
                             HStack(spacing: 0) {
-                                ForEach(Array(viewModel.generateCode39(input: studentID)), id: \.self) { bar in
+                                ForEach(Array(viewModel.generateCode39(from: studentID)), id: \.self) { bar in
                                     Rectangle()
                                         .fill(bar == "1" ? Color.black : Color.white)
                                         .frame(width: barwidth, height: barheight)
@@ -52,13 +51,6 @@ struct BarcodeView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     .padding()
-                    .toolbar {
-                        Button {
-                            isShowingHelpView = true
-                        } label: {
-                            Image(systemName: "questionmark.circle")
-                        }
-                    }
                 } else {
                     Button {
                         isShowingBarcodeSetupView = true
@@ -86,14 +78,11 @@ struct BarcodeView: View {
                 BarcodeSetupView()
                     .toolbar {
                         Button {
-                            dismiss()
+                            isShowingBarcodeSetupView = false
                         } label: {
                             Text("취소")
                         }
                     }
-            }
-            .sheet(isPresented: $isShowingHelpView) {
-                BarcodeHelpView()
             }
         }
     }
