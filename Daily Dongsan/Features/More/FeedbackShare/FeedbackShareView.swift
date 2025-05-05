@@ -17,7 +17,7 @@ struct FeedbackShareView: View {
                     Text("김병윤: ellio__ot")
                 }
                 Button {
-                    UIApplication.shared.open(URL(string: "https://www.instagram.com/j1hxna/")!)
+                    UIApplication.shared.open(URL(string: "https://www.instagram.com/j12han/")!)
                 } label: {
                     Text("최지한: j1hxna")
                 }

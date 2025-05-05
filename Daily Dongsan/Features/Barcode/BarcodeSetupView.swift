@@ -10,6 +10,7 @@ import SwiftUI
 struct BarcodeSetupView: View {
     @Environment(\.dismiss) private var dismiss
     
+    @AppStorage("showOnboardingView") private var showOnboardingView = true
     @AppStorage("studentID") private var studentID: String?
     
     @StateObject private var viewModel = BarcodeViewModel()
@@ -63,7 +64,11 @@ struct BarcodeSetupView: View {
                 viewModel.validateCode(code: input)
                 if viewModel.isValid {
                     studentID = "DS" + input
-                    dismiss()
+                    if showOnboardingView {
+                        showOnboardingView = false
+                    } else {
+                        dismiss()
+                    } 
                     HapticManager().notification(notificationType: .success)
                 }
             } label: {

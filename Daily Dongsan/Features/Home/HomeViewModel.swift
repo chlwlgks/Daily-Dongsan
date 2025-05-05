@@ -11,6 +11,7 @@ import FirebaseFirestore
 class HomeViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var meals: [Meal] = []
+    @Published var announcement: String?
     
     init() {
         Task {
@@ -27,13 +28,22 @@ class HomeViewModel: ObservableObject {
     
     @MainActor
     func fetchMeals() async {
-        withAnimation(.smooth) {
+        withAnimation {
             isLoading = true
         }
         let fetched = await FetchMeals().fetchMeals(for: Date())
         meals = fetched
-        withAnimation(.smooth) {
+        withAnimation {
             isLoading = false
+        }
+    }
+    
+    @MainActor
+    func fetchAnnouncement() async {
+        let db = Firestore.firestore()
+        let fetched = try? await db.collection("announcement").document("content").getDocument().data()?["text"] as! String?
+        withAnimation {
+            announcement = fetched
         }
     }
 }

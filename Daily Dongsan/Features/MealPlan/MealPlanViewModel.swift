@@ -27,12 +27,12 @@ class MealPlanViewModel: ObservableObject {
     
     @MainActor
     func fetchMeals() async {
-        withAnimation(.smooth) {
+        withAnimation {
             isLoading = true
         }
         let fetched = await FetchMeals().fetchMeals(for: selectedDate)
         meals = fetched
-        withAnimation(.smooth) {
+        withAnimation {
             isLoading = false
         }
     }

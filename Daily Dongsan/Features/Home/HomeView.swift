@@ -9,10 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.colorScheme) private var scheme
     
     @ObservedObject private var viewModel = HomeViewModel()
-    
-//    @State private var announcement: String = ""
     
     var body: some View {
         NavigationStack {
@@ -29,6 +28,20 @@ struct HomeView: View {
                 .padding(.top, horizontalSizeClass == .compact ? 16 : 0)
                 .padding(.top, horizontalSizeClass == .compact ? 16 : 0)
                 
+                if let announcement = viewModel.announcement, !announcement.isEmpty {
+                    Label {
+                        Text(announcement)
+                    } icon: {
+                        Image(systemName: "megaphone.fill")
+                            .foregroundStyle(.accent)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(.secondary.opacity(scheme == .light ? 0.1 : 0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal)
+                }
+                
                 if horizontalSizeClass == .regular {
                     if viewModel.isLoading {
                         RegularHomeView(meals: Meal.sampleMeals)
@@ -44,11 +57,14 @@ struct HomeView: View {
                         RegularMealListView(meals: viewModel.meals)
                     }
                 }
+                
+                Spacer()
             }
-        }
-        .onAppear {
-            Task {
-                await viewModel.fetchMeals()
+            .onAppear {
+                Task {
+                    await viewModel.fetchMeals()
+                    await viewModel.fetchAnnouncement()
+                }
             }
         }
     }
@@ -72,7 +88,7 @@ struct HomeView: View {
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 1)
                         
-                        if let menus = meal.menus {
+                        if let menus = meal.menus, !menus.isEmpty {
                             VStack(alignment: .leading) {
                                 ForEach(menus, id: \.self) { menu in
                                     if let list = menu.allergies, !Set(list).isDisjoint(with: selectedAllergies) {
@@ -95,6 +111,7 @@ struct HomeView: View {
                     }
                 }
             }
+            .padding(.top)
             .padding(.horizontal)
         }
     }

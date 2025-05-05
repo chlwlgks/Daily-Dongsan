@@ -17,7 +17,7 @@ struct RegularMealListView: View {
     var body: some View {
         List(meals, id: \.mealCode) { meal in
             Section {
-                if let menus = meal.menus {
+                if let menus = meal.menus, !menus.isEmpty {
                     VStack(alignment: .leading) {
                         ForEach(menus, id: \.self) { menu in
                             if let list = menu.allergies, !Set(list).isDisjoint(with: selectedAllergies) {

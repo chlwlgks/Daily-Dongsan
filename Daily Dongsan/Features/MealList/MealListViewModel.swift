@@ -13,7 +13,7 @@ class MealListViewModel: ObservableObject {
     func attributedMenuList(for menus: [Menu]?) -> AttributedString {
         var result = AttributedString()
         
-        guard let menus = menus else {
+        guard let menus = menus, !menus.isEmpty else {
             return AttributedString("급식 정보가 없습니다.")
         }
         
