@@ -81,7 +81,12 @@ struct MealPlanView: View {
                         }
                     }
                     
-                    RegularMealListView(meals: viewModel.meals)
+                    if viewModel.isLoading {
+                        RegularMealListView(meals: Meal.sampleMeals)
+                            .skeleton(isRedacted: true)
+                    } else {
+                        RegularMealListView(meals: viewModel.meals)
+                    }
                 }
                 
                 Spacer()
@@ -99,7 +104,12 @@ struct MealPlanView: View {
                     .datePickerStyle(.graphical)
                     .padding(.horizontal)
                 
-                CompactMealListView(meals: viewModel.meals)
+                if viewModel.isLoading {
+                    CompactMealListView(meals: Meal.sampleMeals)
+                        .skeleton(isRedacted: true)
+                } else {
+                    CompactMealListView(meals: viewModel.meals)
+                }
             }
             .toolbar {
                 Button {

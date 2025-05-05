@@ -81,7 +81,7 @@ class FetchMeals {
         return meals
     }
     
-    func parseMeals(from meal: String) -> [Menu] {
+    private func parseMeals(from meal: String) -> [Menu] {
         var parsedMenus: [Menu] = []
         
         let lines = meal.split(separator: "<br/>").compactMap { line in

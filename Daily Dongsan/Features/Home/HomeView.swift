@@ -10,11 +10,9 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
-    @State private var isConnected: Bool = true
-    
     @ObservedObject private var viewModel = HomeViewModel()
     
-    @State private var announcement: String = ""
+//    @State private var announcement: String = ""
     
     var body: some View {
         NavigationStack {
@@ -32,9 +30,19 @@ struct HomeView: View {
                 .padding(.top, horizontalSizeClass == .compact ? 16 : 0)
                 
                 if horizontalSizeClass == .regular {
-                    RegularHomeView(viewModel: viewModel)
+                    if viewModel.isLoading {
+                        RegularHomeView(meals: Meal.sampleMeals)
+                            .skeleton(isRedacted: true)
+                    } else {
+                        RegularHomeView(meals: viewModel.meals)
+                    }
                 } else {
-                    CompactMealListView(meals: viewModel.meals)
+                    if viewModel.isLoading {
+                        RegularMealListView(meals: Meal.sampleMeals)
+                            .skeleton(isRedacted: true)
+                    } else {
+                        RegularMealListView(meals: viewModel.meals)
+                    }
                 }
             }
         }
@@ -47,12 +55,11 @@ struct HomeView: View {
     
     private struct RegularHomeView: View {
         private let selectedAllergies = Set(UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? [])
-        
-        @ObservedObject var viewModel: HomeViewModel
+        let meals: [Meal]
         
         var body: some View {
             HStack(alignment: .top) {
-                ForEach(viewModel.meals, id: \.mealCode) { meal in
+                ForEach(meals, id: \.mealCode) { meal in
                     VStack(alignment: .leading) {
                         HStack {
                             Text(meal.mealType)

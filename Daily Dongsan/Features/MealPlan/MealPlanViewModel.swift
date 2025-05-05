@@ -5,15 +5,16 @@
 //  Created by 최지한 on 4/12/25.
 //
 
-import Foundation
+import SwiftUI
 
 class MealPlanViewModel: ObservableObject {
+    @Published var isLoading: Bool = false
     @Published var selectedDate = Date()
     @Published var meals: [Meal] = []
     
     init() {
-        Task { @MainActor in
-            meals = await FetchMeals().fetchMeals(for: selectedDate)
+        Task {
+            await fetchMeals()
         }
     }
     
@@ -24,9 +25,15 @@ class MealPlanViewModel: ObservableObject {
         return dateFormatter.string(from: selectedDate)
     }
     
+    @MainActor
     func fetchMeals() async {
-        Task { @MainActor in
-            meals = await FetchMeals().fetchMeals(for: selectedDate)
+        withAnimation(.smooth) {
+            isLoading = true
+        }
+        let fetched = await FetchMeals().fetchMeals(for: selectedDate)
+        meals = fetched
+        withAnimation(.smooth) {
+            isLoading = false
         }
     }
 }

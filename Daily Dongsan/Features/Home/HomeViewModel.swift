@@ -5,15 +5,16 @@
 //  Created by 최지한 on 4/11/25.
 //
 
-import Foundation
+import SwiftUI
 import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
+    @Published var isLoading: Bool = false
     @Published var meals: [Meal] = []
     
     init() {
-        Task { @MainActor in
-            meals = await FetchMeals().fetchMeals(for: Date())
+        Task {
+            await fetchMeals()
         }
     }
     
@@ -24,9 +25,15 @@ class HomeViewModel: ObservableObject {
         return dateFormatter.string(from: Date())
     }
     
+    @MainActor
     func fetchMeals() async {
-        Task { @MainActor in
-            meals = await FetchMeals().fetchMeals(for: Date())
+        withAnimation(.smooth) {
+            isLoading = true
+        }
+        let fetched = await FetchMeals().fetchMeals(for: Date())
+        meals = fetched
+        withAnimation(.smooth) {
+            isLoading = false
         }
     }
 }
