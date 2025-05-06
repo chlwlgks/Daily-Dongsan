@@ -34,17 +34,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C471A8832DC24FF600AFF503 /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4D8FFB12DCA24F600845CC8 /* Daily Dongsan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4D8FFB22DCA24F600845CC8 /* Daily Dongsan Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4D8FFB32DCA24F600845CC8 /* Daily Dongsan Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Daily Dongsan Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Daily Dongsan Watch Watch App";
-			sourceTree = "<group>";
-		};
 		C473E4042DA809C500F92FE5 /* Daily Dongsan */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Daily Dongsan";
@@ -75,10 +70,9 @@
 			isa = PBXGroup;
 			children = (
 				C473E4042DA809C500F92FE5 /* Daily Dongsan */,
-				C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */,
-				C471A8832DC24FF600AFF503 /* Daily Dongsan.app */,
-				C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */,
-				C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */,
+				C4D8FFB12DCA24F600845CC8 /* Daily Dongsan.app */,
+				C4D8FFB22DCA24F600845CC8 /* Daily Dongsan Watch.app */,
+				C4D8FFB32DCA24F600845CC8 /* Daily Dongsan Watch Watch App.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -101,7 +95,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Daily Dongsan Watch";
-			productReference = C471A8842DC24FF600AFF503 /* Daily Dongsan Watch.app */;
+			productReference = C4D8FFB22DCA24F600845CC8 /* Daily Dongsan Watch.app */;
 			productType = "com.apple.product-type.application.watchapp2-container";
 		};
 		C43037C12DA88A4300E415F6 /* Daily Dongsan Watch Watch App */ = {
@@ -116,14 +110,11 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				C43037C62DA88A4300E415F6 /* Daily Dongsan Watch Watch App */,
-			);
 			name = "Daily Dongsan Watch Watch App";
 			packageProductDependencies = (
 			);
 			productName = "Daily Dongsan Watch Watch App";
-			productReference = C471A8852DC24FF600AFF503 /* Daily Dongsan Watch Watch App.app */;
+			productReference = C4D8FFB32DCA24F600845CC8 /* Daily Dongsan Watch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C4F1CABC2C955E9A0031BB29 /* Daily Dongsan */ = {
@@ -146,7 +137,7 @@
 				C47B1E782CBA2079007309E6 /* FirebaseFirestore */,
 			);
 			productName = "Daily Dongsan";
-			productReference = C471A8832DC24FF600AFF503 /* Daily Dongsan.app */;
+			productReference = C4D8FFB12DCA24F600845CC8 /* Daily Dongsan.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -473,7 +464,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jihani.Daily-Dongsan";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -509,7 +500,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jihani.Daily-Dongsan";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
