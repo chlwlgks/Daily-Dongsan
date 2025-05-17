@@ -25,10 +25,24 @@ struct HomeView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .padding(.top, horizontalSizeClass == .compact ? 16 : 0)
-                .padding(.top, horizontalSizeClass == .compact ? 16 : 0)
+                .padding(horizontalSizeClass == .compact ? .top : .init())
+                .padding(horizontalSizeClass == .compact ? .top : .init())
                 
-                if let announcement = viewModel.announcement, !announcement.isEmpty {
+                if viewModel.isAnnouncementLoading {
+                    Label {
+                        Text("하님을 경외하고 이웃을 사랑하자")
+                    } icon: {
+                        Image(systemName: "megaphone.fill")
+                            .foregroundStyle(.accent)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(.secondary.opacity(scheme == .light ? 0.1 : 0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .skeleton(isRedacted: true)
+                    .padding(.horizontal)
+                    .padding(horizontalSizeClass == .regular ? .bottom : .init())
+                } else if let announcement = viewModel.announcement, !announcement.isEmpty {
                     Label {
                         Text(announcement)
                     } icon: {
@@ -40,17 +54,18 @@ struct HomeView: View {
                     .background(.secondary.opacity(scheme == .light ? 0.1 : 0.15))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal)
+                    .padding(horizontalSizeClass == .regular ? .bottom : .init())
                 }
                 
                 if horizontalSizeClass == .regular {
-                    if viewModel.isLoading {
+                    if viewModel.isMealsLoading {
                         RegularHomeView(meals: Meal.sampleMeals)
                             .skeleton(isRedacted: true)
                     } else {
                         RegularHomeView(meals: viewModel.meals)
                     }
                 } else {
-                    if viewModel.isLoading {
+                    if viewModel.isMealsLoading {
                         RegularMealListView(meals: Meal.sampleMeals)
                             .skeleton(isRedacted: true)
                     } else {
@@ -62,8 +77,10 @@ struct HomeView: View {
             }
             .onAppear {
                 Task {
-                    await viewModel.fetchMeals()
-                    await viewModel.fetchAnnouncement()
+                    async let mealsTask: () = viewModel.fetchMeals()
+                    async let announcementTask: () = viewModel.fetchAnnouncement()
+                    await mealsTask
+                    await announcementTask
                 }
             }
         }
@@ -111,7 +128,6 @@ struct HomeView: View {
                     }
                 }
             }
-            .padding(.top)
             .padding(.horizontal)
         }
     }

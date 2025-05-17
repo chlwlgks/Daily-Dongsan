@@ -12,12 +12,6 @@ class MealPlanViewModel: ObservableObject {
     @Published var selectedDate = Date()
     @Published var meals: [Meal] = []
     
-    init() {
-        Task {
-            await fetchMeals()
-        }
-    }
-    
     func selectedDateAsString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ko_KR")

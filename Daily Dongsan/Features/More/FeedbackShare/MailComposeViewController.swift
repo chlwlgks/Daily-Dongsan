@@ -32,14 +32,14 @@ class MailComposeViewController: NSObject, MFMailComposeViewControllerDelegate {
     
     func sendEmail() {
         let recipients = "geubchelin@icloud.com"
-        let subject = "급슐랭 피드백"
+        let subject = "데일리 동산 피드백"
         let messageBody = """
         
         
         
         
         
-                
+        
         모델명: \(modelName)
         \(systemName) 버전: \(sytemVersion)
         급슐랭 버전: \(appVersion)

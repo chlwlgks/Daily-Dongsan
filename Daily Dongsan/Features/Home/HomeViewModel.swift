@@ -9,15 +9,10 @@ import SwiftUI
 import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
-    @Published var isLoading: Bool = false
+    @Published var isMealsLoading: Bool = false
+    @Published var isAnnouncementLoading: Bool = false
     @Published var meals: [Meal] = []
     @Published var announcement: String?
-    
-    init() {
-        Task {
-            await fetchMeals()
-        }
-    }
     
     func currentDateAsString() -> String {
         let dateFormatter = DateFormatter()
@@ -29,21 +24,25 @@ class HomeViewModel: ObservableObject {
     @MainActor
     func fetchMeals() async {
         withAnimation {
-            isLoading = true
+            isMealsLoading = true
         }
         let fetched = await FetchMeals().fetchMeals(for: Date())
         meals = fetched
         withAnimation {
-            isLoading = false
+            isMealsLoading = false
         }
     }
     
     @MainActor
     func fetchAnnouncement() async {
+        withAnimation {
+            isAnnouncementLoading = true
+        }
         let db = Firestore.firestore()
         let fetched = try? await db.collection("announcement").document("content").getDocument().data()?["text"] as! String?
         withAnimation {
             announcement = fetched
+            isAnnouncementLoading = false
         }
     }
 }

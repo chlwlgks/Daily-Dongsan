@@ -50,16 +50,16 @@ class FetchMeals {
                     }
                 }
             } catch {
-                print("Failed to load meals: \(error.localizedDescription)")
+                print("\(mealType)을 로드하는 데 실패했습니다: \(error.localizedDescription)")
             }
         }
         
 // MARK: - 중식
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "yMMdd"
-        let currentDate = dateformatter.string(from: date)
+        let formattedDate = dateformatter.string(from: date)
         
-        let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(currentDate)")!
+        let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(formattedDate)")!
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
@@ -75,7 +75,7 @@ class FetchMeals {
                 }
             }
         } catch {
-            print("Failed to load meals: \(error.localizedDescription)")
+            print("중식을 로드하는 데 실패했습니다: \(error.localizedDescription)")
         }
         
         return meals
