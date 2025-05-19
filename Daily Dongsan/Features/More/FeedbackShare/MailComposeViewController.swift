@@ -31,7 +31,7 @@ class MailComposeViewController: NSObject, MFMailComposeViewControllerDelegate {
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
     
     func sendEmail() {
-        let recipients = "geubchelin@icloud.com"
+        let recipients = "dailydongsan@icloud.com"
         let subject = "데일리 동산 피드백"
         let messageBody = """
         

@@ -40,6 +40,7 @@ struct RegularMealListView: View {
                     }
                 }
             }
+            .textSelection(.enabled)
         }
         .listStyle(.plain)
     }
@@ -63,6 +64,7 @@ struct CompactMealListView: View {
                     }
                 }
             }
+            .textSelection(.enabled)
         }
         .listStyle(.plain)
     }

@@ -45,6 +45,7 @@ struct HomeView: View {
                 } else if let announcement = viewModel.announcement, !announcement.isEmpty {
                     Label {
                         Text(announcement)
+                            .textSelection(.enabled)
                     } icon: {
                         Image(systemName: "megaphone.fill")
                             .foregroundStyle(.accent)
@@ -120,6 +121,7 @@ struct HomeView: View {
                             Text("급식 정보가 없습니다.")
                         }
                     }
+                    .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
                     if meal.mealCode != "3" {
