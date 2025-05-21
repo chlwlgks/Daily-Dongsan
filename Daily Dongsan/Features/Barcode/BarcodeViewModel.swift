@@ -33,7 +33,7 @@ class BarcodeViewModel: ObservableObject {
     @Published var isValid = true
     
     func validateCode(code: String) {
-        if code.count == 5 && code.allSatisfy(\.isNumber) {
+        if code.count == 5 {
             isValid = true
         } else {
             isValid = false

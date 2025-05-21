@@ -49,6 +49,14 @@ struct MoreView: View {
                     }
                 }
                 
+//                Section {
+//                    NavigationLink {
+//                        Text("흐흐흐")
+//                    } label: {
+//                        Text("하이라이트한 급식")
+//                    }
+//                }
+                
                 Section {
                     NavigationLink {
                         FeedbackShareView()

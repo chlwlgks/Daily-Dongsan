@@ -36,16 +36,17 @@ struct BarcodeSetupView: View {
                     Text("DS")
                         .padding(.trailing)
                     TextField("학생증 코드", text: $input)
+                        .keyboardType(.asciiCapable)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: 50)
                         .background {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.secondary)
                         }
-                        .keyboardType(.numberPad)
                         .onChange(of: input) { newValue in
-                            let filtered = newValue.filter { $0.isNumber }
-                            input = String(filtered.prefix(5))
+                            input = String(newValue.prefix(5))
                         }
                         .onSubmit {
                             viewModel.validateCode(code: input)
