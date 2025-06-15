@@ -52,7 +52,7 @@ struct BarcodeSetupView: View {
                             viewModel.validateCode(code: input)
                         }
                 }
-                Text("학생증 코드는 5자리 숫자여야 합니다.")
+                Text("학생증 코드는 5자리여야 합니다.")
                     .foregroundStyle(.red)
                     .opacity(viewModel.isValid ? 0 : 1)
             }

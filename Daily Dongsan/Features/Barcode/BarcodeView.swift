@@ -46,9 +46,9 @@ struct BarcodeView: View {
                                 .padding(.top)
                                 .padding(.top)
                                 .padding(.top)
-                            Text("1학년은 학생증 바코드가 제대로 동작하지 않을 수 있습니다. 제대로 동작하지 않을 시 문의 바랍니다.")
-                                .multilineTextAlignment(.center)
-                                .padding(.top)
+//                            Text("1학년은 학생증 바코드가 제대로 동작하지 않을 수 있습니다. 제대로 동작하지 않을 시 문의 바랍니다.")
+//                                .multilineTextAlignment(.center)
+//                                .padding(.top)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }

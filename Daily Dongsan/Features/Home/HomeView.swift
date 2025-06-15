@@ -25,8 +25,6 @@ struct HomeView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .padding(horizontalSizeClass == .compact ? .top : .init())
-                .padding(horizontalSizeClass == .compact ? .top : .init())
                 
                 if viewModel.isAnnouncementLoading {
                     Label {
@@ -82,6 +80,18 @@ struct HomeView: View {
                     async let announcementTask: () = viewModel.fetchAnnouncement()
                     await mealsTask
                     await announcementTask
+                }
+            }
+            .toolbar {
+                Button {
+                    Task {
+                        async let mealsTask: () = viewModel.fetchMeals()
+                        async let announcementTask: () = viewModel.fetchAnnouncement()
+                        await mealsTask
+                        await announcementTask
+                    }
+                } label: {
+                    Text("오늘")
                 }
             }
         }

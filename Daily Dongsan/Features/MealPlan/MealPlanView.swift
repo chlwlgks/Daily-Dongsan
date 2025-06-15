@@ -50,7 +50,7 @@ struct MealPlanView: View {
                     await viewModel.fetchMeals()
                 }
             }
-            .navigationTitle(horizontalSizeClass == .compact ? formattedDate + "식단" : "")
+            .navigationTitle(horizontalSizeClass == .compact ? formattedDate + " 식단" : "")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
