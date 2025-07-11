@@ -11,7 +11,6 @@ struct MealPlanView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     @ObservedObject private var viewModel = MealPlanViewModel()
-    
     @State private var isConnected: Bool = true
     
     private var formattedDate: String {
@@ -40,18 +39,16 @@ struct MealPlanView: View {
                     CompactMealView(viewModel: viewModel)
                 }
             }
-            .onAppear {
-                Task {
-                    await viewModel.fetchMeals()
-                }
+            .navigationTitle(horizontalSizeClass == .compact ? formattedDate + " 식단" : "")
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                await viewModel.fetchMeals()
             }
             .onChange(of: viewModel.selectedDate) { _ in
                 Task {
                     await viewModel.fetchMeals()
                 }
             }
-            .navigationTitle(horizontalSizeClass == .compact ? formattedDate + " 식단" : "")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
@@ -63,7 +60,7 @@ struct MealPlanView: View {
                 VStack(alignment: .leading) {
                     Text(viewModel.selectedDateAsString())
                         .font(.system(.subheadline, weight: .semibold))
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                     Text("식단")
                         .font(.system(.largeTitle, weight: .bold))
                 }
@@ -74,10 +71,8 @@ struct MealPlanView: View {
                         DatePicker("날짜", selection: $viewModel.selectedDate, displayedComponents: .date)
                             .datePickerStyle(.graphical)
                         
-                        Button {
+                        Button("오늘") {
                             viewModel.selectedDate = Date()
-                        } label: {
-                            Text("오늘")
                         }
                     }
                     
@@ -112,12 +107,9 @@ struct MealPlanView: View {
                 }
             }
             .toolbar {
-                Button {
+                Button("오늘") {
                     viewModel.selectedDate = Date()
-                } label: {
-                    Text("오늘")
                 }
-                
             }
         }
     }

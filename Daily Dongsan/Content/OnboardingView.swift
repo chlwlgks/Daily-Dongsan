@@ -92,7 +92,7 @@ struct OnboardingView: View {
                     .fontWeight(.semibold)
                 Text(description)
                     .font(.subheadline)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(.bottom)

@@ -44,7 +44,7 @@ struct SkeletonModifier: ViewModifier {
                             .offset(x: isAnimating ? maxX : minX)
                     }
                     .blendMode(.softLight)
-                    .task {
+                    .onAppear {
                         guard !isAnimating else { return }
                         withAnimation(animation) {
                             isAnimating = true

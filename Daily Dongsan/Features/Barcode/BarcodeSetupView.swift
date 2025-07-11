@@ -70,7 +70,7 @@ struct BarcodeSetupView: View {
                     } else {
                         dismiss()
                     } 
-                    HapticManager().notification(notificationType: .success)
+                    HapticManager.instance.notification(notificationType: .success)
                 }
             } label: {
                 Text("완료")

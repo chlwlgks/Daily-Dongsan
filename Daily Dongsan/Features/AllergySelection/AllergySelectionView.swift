@@ -14,7 +14,7 @@ struct AllergySelectionView: View {
         List(viewModel.allergies) { allergy in
             Button {
                 viewModel.toggleSelection(for: allergy.id)
-                HapticManager().selection()
+                HapticManager.instance.selection()
             } label: {
                 HStack {
                     Text("\(allergy.id). \(allergy.name)")

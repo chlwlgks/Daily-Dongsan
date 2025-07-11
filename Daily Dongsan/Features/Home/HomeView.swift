@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.scenePhase) private var scenePhase
     
     @ObservedObject private var viewModel = HomeViewModel()
     
@@ -19,12 +20,15 @@ struct HomeView: View {
                 VStack(alignment: .leading) {
                     Text(viewModel.currentDateAsString())
                         .font(.system(.subheadline, weight: .semibold))
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                     Text("안산동산고등학교")
                         .font(.system(.largeTitle, weight: .bold))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
+                .padding(horizontalSizeClass == .compact ? .top : .init())
+                .padding(horizontalSizeClass == .compact ? .top : .init())
+                .padding(horizontalSizeClass == .compact ? .top : .init())
                 
                 if viewModel.isAnnouncementLoading {
                     Label {
@@ -74,24 +78,20 @@ struct HomeView: View {
                 
                 Spacer()
             }
-            .onAppear {
-                Task {
-                    async let mealsTask: () = viewModel.fetchMeals()
-                    async let announcementTask: () = viewModel.fetchAnnouncement()
-                    await mealsTask
-                    await announcementTask
-                }
+            .task {
+                async let mealsTask: () = viewModel.fetchMeals()
+                async let announcementTask: () = viewModel.fetchAnnouncement()
+                await mealsTask
+                await announcementTask
             }
-            .toolbar {
-                Button {
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active {
                     Task {
                         async let mealsTask: () = viewModel.fetchMeals()
                         async let announcementTask: () = viewModel.fetchAnnouncement()
                         await mealsTask
                         await announcementTask
                     }
-                } label: {
-                    Text("오늘")
                 }
             }
         }

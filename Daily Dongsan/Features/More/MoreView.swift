@@ -9,37 +9,34 @@ import SwiftUI
 
 struct MoreView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    
-//    @State private var breakfastNotification: Bool = UserDefaults.standard.bool(forKey: "breakfastNotification")
-//    @State private var lunchNotification: Bool = UserDefaults.standard.bool(forKey: "lunchNotification")
-//    @State private var dinnerNotification: Bool = UserDefaults.standard.bool(forKey: "dinnerNotification")
+    @AppStorage("breakfastNotificationEnabled") var breakfastNotificationEnabled: Bool = false
+    @AppStorage("lunchNotificationEnabled") var lunchNotificationEnabled: Bool = false
+    @AppStorage("dinnerNotificationEnabled") var dinnerNotificationEnabled: Bool = false
     
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
     
     var body: some View {
         NavigationStack {
             List {
-//                Section {
-//                    NavigationLink {
-//                        NotificationSettingsView()
-//                    } label: {
-//                        HStack {
-//                            Label {
-//                                Text("알림")
-//                            } icon: {
-//                                IconView(foregroundStyle: Color.red, systemImage: "bell.badge.fill")
-//                            }
-//                            Spacer()
-//                            if breakfastNotification || lunchNotification || dinnerNotification {
-//                                Text("켬")
-//                                    .foregroundStyle(.secondary)
-//                            } else {
-//                                Text("끔")
-//                                    .foregroundStyle(.secondary)
-//                            }
-//                        }
-//                    }
-//                }
+                Section {
+                    NavigationLink {
+                        NotificationSettingsView()
+                    } label: {
+                        HStack {
+                            Text("알림")
+                            Spacer()
+                            if breakfastNotificationEnabled || lunchNotificationEnabled || dinnerNotificationEnabled {
+                                Text("켬")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("끔")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } footer: {
+                    Text("알림은 평일에만 전송됩니다.")
+                }
                 
                 Section {
                     NavigationLink {
@@ -68,11 +65,6 @@ struct MoreView: View {
                 }
             }
             .navigationTitle("더보기")
-//            .onAppear {
-//                breakfastNotification = UserDefaults.standard.bool(forKey: "breakfastNotification")
-//                lunchNotification = UserDefaults.standard.bool(forKey: "lunchNotification")
-//                dinnerNotification = UserDefaults.standard.bool(forKey: "dinnerNotification")
-//            }
         }
     }
 }

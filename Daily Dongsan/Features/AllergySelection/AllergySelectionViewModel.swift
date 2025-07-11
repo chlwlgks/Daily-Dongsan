@@ -26,7 +26,7 @@ class AllergySelectionViewModel: ObservableObject {
         Allergy(id: "15", name: "닭고기"),
         Allergy(id: "16", name: "쇠고기"),
         Allergy(id: "17", name: "오징어"),
-        Allergy(id: "18", name: "조개류 (굴·전복·홍합)"),
+        Allergy(id: "18", name: "조개류(굴, 전복, 홍합)"),
         Allergy(id: "19", name: "잣")
     ]
     

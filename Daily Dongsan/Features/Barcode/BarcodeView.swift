@@ -68,7 +68,7 @@ struct BarcodeView: View {
             }
             .navigationTitle("학생증")
         }
-        .onAppear {
+        .task {
             if studentID == nil {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
                     isShowingBarcodeSetupView = true
@@ -79,10 +79,8 @@ struct BarcodeView: View {
             NavigationStack {
                 BarcodeSetupView()
                     .toolbar {
-                        Button {
+                        Button("취소") {
                             isShowingBarcodeSetupView = false
-                        } label: {
-                            Text("취소")
                         }
                     }
             }

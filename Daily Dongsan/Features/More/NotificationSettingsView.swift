@@ -8,114 +8,105 @@
 import SwiftUI
 
 struct NotificationSettingsView: View {
-    @State private var breakfastNotification: Bool = UserDefaults.standard.bool(forKey: "breakfastNotification")
-    @State private var breakfastTime: Date = (UserDefaults.standard.object(forKey: "breakfastTime") as? Date ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())) ?? Date()
-    
-    @State private var lunchNotification: Bool = UserDefaults.standard.bool(forKey: "lunchNotification")
-    @State private var lunchTime: Date = (UserDefaults.standard.object(forKey: "lunchTime") as? Date ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())) ?? Date()
-    
-    @State private var dinnerNotification: Bool = UserDefaults.standard.bool(forKey: "dinnerNotification")
-    @State private var dinnerTime: Date = (UserDefaults.standard.object(forKey: "dinnerTime") as? Date ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())) ?? Date()
+    @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var viewModel =  NotificationSettingsViewModel()
     
     var body: some View {
-        NavigationStack {
-            Form {
+        Form {
+            if viewModel.notificationAuthorizationStatus != .authorized && viewModel.notificationAuthorizationStatus != .provisional {
                 Section {
-                    Toggle(isOn: $breakfastNotification) {
+                    VStack {
+                        Text("데일리 동산의 알림이 허용되어 있지 않습니다.")
+                            .foregroundStyle(.red)
+                        Button("설정에서 권한 허용하기") {
+                            let url = URL(string: "app-settings:notifications")!
+                            openURL(url)
+                        }
+                    }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            
+            Group {
+                Section {
+                    Toggle(isOn: $viewModel.breakfastNotificationEnabled) {
                         Text("조식 알림")
                     }
-                    DatePicker("시간", selection: $breakfastTime, displayedComponents: .hourAndMinute)
+                    DatePicker("시간", selection: $viewModel.breakfastNotificationTime, displayedComponents: .hourAndMinute)
                 }
-                .onChange(of: breakfastNotification) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "breakfastNotification")
-                    handleNotificationChange(meal: "조식", notificationEnabled: newValue, time: breakfastTime)
-                }
-                .onChange(of: breakfastTime) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "breakfastTime")
-                    handleNotificationChange(meal: "조식", notificationEnabled: breakfastNotification, time: newValue)
-                }
-                
                 Section {
-                    Toggle(isOn: $lunchNotification) {
+                    Toggle(isOn: $viewModel.lunchNotificationEnabled) {
                         Text("중식 알림")
                     }
-                    DatePicker("시간", selection: $lunchTime, displayedComponents: .hourAndMinute)
+                    DatePicker("시간", selection: $viewModel.lunchNotificationTime, displayedComponents: .hourAndMinute)
                 }
-                .onChange(of: lunchNotification) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "lunchNotification")
-                    handleNotificationChange(meal: "중식", notificationEnabled: newValue, time: lunchTime)
-                }
-                .onChange(of: lunchTime) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "lunchTime")
-                    handleNotificationChange(meal: "중식", notificationEnabled: lunchNotification, time: newValue)
-                }
-                
                 Section {
-                    Toggle(isOn: $dinnerNotification) {
+                    Toggle(isOn: $viewModel.dinnerNotificationEnabled) {
                         Text("석식 알림")
                     }
-                    DatePicker("시간", selection: $dinnerTime, displayedComponents: .hourAndMinute)
-                }
-                .onChange(of: dinnerNotification) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "dinnerNotification")
-                    handleNotificationChange(meal: "석식", notificationEnabled: newValue, time: dinnerTime)
-                }
-                .onChange(of: dinnerTime) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "dinnerTime")
-                    handleNotificationChange(meal: "석식", notificationEnabled: dinnerNotification, time: newValue)
+                    DatePicker("시간", selection: $viewModel.dinnerNotificationTime, displayedComponents: .hourAndMinute)
                 }
             }
-            .navigationTitle("알림")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                breakfastNotification = UserDefaults.standard.bool(forKey: "breakfastNotification")
-                breakfastTime = (UserDefaults.standard.object(forKey: "breakfastTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
-
-                lunchNotification = UserDefaults.standard.bool(forKey: "lunchNotification")
-                lunchTime = (UserDefaults.standard.object(forKey: "lunchTime") as? Date) ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
-
-                dinnerNotification = UserDefaults.standard.bool(forKey: "dinnerNotification")
-                dinnerTime = (UserDefaults.standard.object(forKey: "dinnerTime") as? Date) ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
+            .disabled(viewModel.notificationAuthorizationStatus != .authorized && viewModel.notificationAuthorizationStatus != .provisional)
+            
+            Section {
+                NavigationLink {
+                    ResetNotificationsView(viewModel: viewModel)
+                } label: {
+                    Text("'🍽️'이 포함된 알림이 오는 경우")
+                }
+            }
+        }
+        .navigationTitle("알림")
+        .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
+                viewModel.fetchAuthorizationStatus()
             }
         }
     }
-    
-    private func handleNotificationChange(meal: String, notificationEnabled: Bool, time: Date) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+}
+
+struct ResetNotificationsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var viewModel: NotificationSettingsViewModel
+
+    var body: some View {
+        Form {
+            Section {
+                VStack {
+                    Text("""
+                    일부 기기에서 '🍽️' 이모티콘이 포함된 이전 버전의 알림이 오는 오류가 확인됐습니다.
+                    이전 버전의 알림이 올 때에는 버튼을 눌러 알림을 초기화해 주세요.
+                    '🍴, 🍛, 😋' 이모티콘이 포함된 알림은 해당 사항이 없습니다.
+                    """)
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+            }
+            Section {
+                Button("알림 초기화") {
+                    let center = UNUserNotificationCenter.current()
+                    center.removeAllPendingNotificationRequests()
+                    
+                    viewModel.breakfastNotificationEnabled = false
+                    viewModel.breakfastNotificationTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+                    viewModel.lunchNotificationEnabled = false
+                    viewModel.lunchNotificationTime = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+                    viewModel.dinnerNotificationEnabled = false
+                    viewModel.dinnerNotificationTime = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
+                    
+                    dismiss()
+                    HapticManager.instance.notification(notificationType: .success)
+                }
+            }
         }
-        
-        if notificationEnabled {
-            scheduleNotification(meal: meal, time: time)
-        } else {
-            let notificationCenter = UNUserNotificationCenter.current()
-            notificationCenter.removePendingNotificationRequests(withIdentifiers: [meal])
-        }
-    }
-    
-    private func scheduleNotification(meal: String, time: Date) {
-        let content = UNMutableNotificationContent()
-        content.title = "데일리 동산"
-        content.body = "오늘의 \(meal) 메뉴를 확인해 보세요. 🍽️"
-        content.sound = UNNotificationSound.default
-        
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: time)
-        let minute = calendar.component(.minute, from: time)
-        
-        let notificationCenter = UNUserNotificationCenter.current()
-        
-        for weekday in 2...6 {
-            var datecomponents = DateComponents()
-            datecomponents.hour = hour
-            datecomponents.minute = minute
-            datecomponents.weekday = weekday
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: datecomponents, repeats: true)
-            
-            let request = UNNotificationRequest(identifier: "\(meal)_\(weekday)", content: content, trigger: trigger)
-            
-            notificationCenter.add(request)
-        }
+        .navigationTitle("'🍽️'이 포함된 알림이 오는 경우")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
