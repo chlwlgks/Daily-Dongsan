@@ -37,6 +37,7 @@ struct OnboardingView: View {
                     )
                 }
                 .padding(.horizontal)
+                
                 NavigationLink {
                     AllergySelectionView()
                 } label: {

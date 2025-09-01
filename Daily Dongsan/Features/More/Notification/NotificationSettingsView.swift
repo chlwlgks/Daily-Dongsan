@@ -15,7 +15,7 @@ struct NotificationSettingsView: View {
     
     var body: some View {
         Form {
-            if viewModel.notificationAuthorizationStatus != .authorized && viewModel.notificationAuthorizationStatus != .provisional {
+            if viewModel.notificationAuthorizationStatus != .authorized {
                 Section {
                     VStack {
                         Text("데일리 동산의 알림이 허용되어 있지 않습니다.")
@@ -50,13 +50,11 @@ struct NotificationSettingsView: View {
                     DatePicker("시간", selection: $viewModel.dinnerNotificationTime, displayedComponents: .hourAndMinute)
                 }
             }
-            .disabled(viewModel.notificationAuthorizationStatus != .authorized && viewModel.notificationAuthorizationStatus != .provisional)
+            .disabled(viewModel.notificationAuthorizationStatus != .authorized)
             
             Section {
-                NavigationLink {
+                NavigationLink("'🍽️'가 포함된 알림이 오는 경우") {
                     ResetNotificationsView(viewModel: viewModel)
-                } label: {
-                    Text("'🍽️'이 포함된 알림이 오는 경우")
                 }
             }
         }
@@ -73,23 +71,20 @@ struct NotificationSettingsView: View {
 struct ResetNotificationsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: NotificationSettingsViewModel
-
+    
     var body: some View {
         Form {
             Section {
-                VStack {
-                    Text("""
+                Text("""
                     일부 기기에서 '🍽️' 이모티콘이 포함된 이전 버전의 알림이 오는 오류가 확인됐습니다.
-                    이전 버전의 알림이 올 때에는 버튼을 눌러 알림을 초기화해 주세요.
+                    이전 버전의 알림이 올 때에는 아래 버튼을 눌러 알림을 초기화해 주세요.
                     '🍴, 🍛, 😋' 이모티콘이 포함된 알림은 해당 사항이 없습니다.
                     """)
-                        .font(.subheadline)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                }
-            }
-            Section {
-                Button("알림 초기화") {
+                .font(.callout)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(10)
+                
+                Button {
                     let center = UNUserNotificationCenter.current()
                     center.removeAllPendingNotificationRequests()
                     
@@ -102,10 +97,13 @@ struct ResetNotificationsView: View {
                     
                     dismiss()
                     HapticManager.instance.notification(notificationType: .success)
+                } label: {
+                    Text("알림 초기화")
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
         }
-        .navigationTitle("'🍽️'이 포함된 알림이 오는 경우")
+        .navigationTitle("'🍽️'가 포함된 알림이 오는 경우")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

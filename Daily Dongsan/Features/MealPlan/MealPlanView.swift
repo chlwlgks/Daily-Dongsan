@@ -9,22 +9,19 @@ import SwiftUI
 
 struct MealPlanView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
     @ObservedObject private var viewModel = MealPlanViewModel()
-    @State private var isConnected: Bool = true
     
     private var formattedDate: String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
         
         let calendar = Calendar.current
         let selectedYear = calendar.component(.year, from: viewModel.selectedDate)
         let currentYear = calendar.component(.year, from: Date())
         
         if selectedYear == currentYear {
-            dateFormatter.dateFormat = "MMM d일 EEEE"
+            dateFormatter.dateFormat = "M월 d일 EEEE"
         } else {
-            dateFormatter.dateFormat = "yyyy년 MMM d일 EEEE"
+            dateFormatter.dateFormat = "yyyy년 M월 d일 EEEE"
         }
         
         return dateFormatter.string(from: viewModel.selectedDate)

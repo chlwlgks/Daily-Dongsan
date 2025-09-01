@@ -28,13 +28,13 @@ struct SkeletonModifier: ViewModifier {
                     GeometryReader { geometry in
                         let size = geometry.size
                         let skeletonWidth = size.width / 2
-                        
+
                         let blurRadius = max(skeletonWidth / 2, 30)
                         let blurDiameter = blurRadius * 2
-                        
+
                         let minX = -(skeletonWidth + blurDiameter)
                         let maxX = size.width + skeletonWidth + blurDiameter
-                        
+
                         Rectangle()
                             .fill(scheme == .dark ? .white : .black)
                             .frame(width: skeletonWidth, height: size.height * 2)
@@ -44,6 +44,7 @@ struct SkeletonModifier: ViewModifier {
                             .offset(x: isAnimating ? maxX : minX)
                     }
                     .blendMode(.softLight)
+                    .clipped()
                     .onAppear {
                         guard !isAnimating else { return }
                         withAnimation(animation) {

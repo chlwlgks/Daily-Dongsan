@@ -42,7 +42,7 @@ class MailComposeViewController: NSObject, MFMailComposeViewControllerDelegate {
         
         모델명: \(modelName)
         \(systemName) 버전: \(sytemVersion)
-        급슐랭 버전: \(appVersion)
+        데일리 동산 버전: \(appVersion)
         """
         
         let composeVC = MFMailComposeViewController()

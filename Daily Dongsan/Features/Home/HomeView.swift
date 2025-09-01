@@ -30,21 +30,24 @@ struct HomeView: View {
                 .padding(horizontalSizeClass == .compact ? .top : .init())
                 .padding(horizontalSizeClass == .compact ? .top : .init())
                 
-                if viewModel.isAnnouncementLoading {
+                Button {
+                    UIApplication.shared.open(URL(string: "https://www.instagram.com/j12han/")!)
+                } label: {
                     Label {
-                        Text("하님을 경외하고 이웃을 사랑하자")
+                        Text("데일리 동산을 물려받을 후배를 찾아요.\nDM: @j12han")
+                            .foregroundStyle(scheme == .light ? .black : .white)
                     } icon: {
-                        Image(systemName: "megaphone.fill")
+                        Image(systemName: "hand.tap.fill")
                             .foregroundStyle(.accent)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .background(.secondary.opacity(scheme == .light ? 0.1 : 0.15))
+                    .background(.accent.opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .skeleton(isRedacted: true)
                     .padding(.horizontal)
-                    .padding(horizontalSizeClass == .regular ? .bottom : .init())
-                } else if let announcement = viewModel.announcement, !announcement.isEmpty {
+                }
+                
+                if let announcement = viewModel.announcement, !announcement.isEmpty {
                     Label {
                         Text(announcement)
                             .textSelection(.enabled)
@@ -58,6 +61,7 @@ struct HomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal)
                     .padding(horizontalSizeClass == .regular ? .bottom : .init())
+                    
                 }
                 
                 if horizontalSizeClass == .regular {

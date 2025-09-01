@@ -10,14 +10,12 @@ import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
     @Published var isMealsLoading: Bool = false
-    @Published var isAnnouncementLoading: Bool = false
     @Published var meals: [Meal] = []
     @Published var announcement: String?
     
     func currentDateAsString() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "MMM d일 EEEE"
+        dateFormatter.dateFormat = "M월 d일 EEEE"
         return dateFormatter.string(from: Date())
     }
     
@@ -35,14 +33,10 @@ class HomeViewModel: ObservableObject {
     
     @MainActor
     func fetchAnnouncement() async {
-        withAnimation {
-            isAnnouncementLoading = true
-        }
         let db = Firestore.firestore()
         let fetched = try? await db.collection("announcement").document("content").getDocument().data()?["text"] as! String?
         withAnimation {
             announcement = fetched
-            isAnnouncementLoading = false
         }
     }
 }

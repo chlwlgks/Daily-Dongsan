@@ -12,7 +12,6 @@ struct MoreView: View {
     @AppStorage("breakfastNotificationEnabled") var breakfastNotificationEnabled: Bool = false
     @AppStorage("lunchNotificationEnabled") var lunchNotificationEnabled: Bool = false
     @AppStorage("dinnerNotificationEnabled") var dinnerNotificationEnabled: Bool = false
-    
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
     
     var body: some View {
@@ -39,10 +38,8 @@ struct MoreView: View {
                 }
                 
                 Section {
-                    NavigationLink {
+                    NavigationLink("알레르기 유발 식품 선택") {
                         AllergySelectionView()
-                    } label: {
-                        Text("알레르기 유발 식품 선택")
                     }
                 }
                 
@@ -55,14 +52,16 @@ struct MoreView: View {
 //                }
                 
                 Section {
-                    NavigationLink {
+                    NavigationLink("피드백 공유") {
                         FeedbackShareView()
-                    } label: {
-                        Text("피드백 공유")
                     }
                 } footer: {
                     Text("버전: \(appVersion)")
                 }
+                
+//                Button("워치 업데이트") {
+//                    WatchConnector().session.sendMessage(["message" : "메시지 보냄"], replyHandler: nil)
+//                }
             }
             .navigationTitle("더보기")
         }

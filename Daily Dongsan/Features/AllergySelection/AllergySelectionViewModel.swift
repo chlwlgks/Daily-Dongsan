@@ -33,7 +33,7 @@ class AllergySelectionViewModel: ObservableObject {
     @Published var selectedAllergies: Set<String> = []
     
     init() {
-        loadSelectedAllergies()
+        selectedAllergies = Set(UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? [])
     }
     
     func toggleSelection(for allergyID: String) {
@@ -43,9 +43,5 @@ class AllergySelectionViewModel: ObservableObject {
             selectedAllergies.insert(allergyID)
         }
         UserDefaults.standard.set(Array(selectedAllergies), forKey: "SelectedAllergies")
-    }
-    
-    func loadSelectedAllergies() {
-        selectedAllergies = Set(UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? [])
     }
 }

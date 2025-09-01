@@ -11,6 +11,7 @@ import SwiftData
 enum AppTab: String, CaseIterable {
     case home = "홈"
     case mealPlan = "식단"
+    case timetable = "시간표"
     case barcode = "학생증"
     case more = "더보기"
     
@@ -18,6 +19,7 @@ enum AppTab: String, CaseIterable {
         switch self {
         case .home: return "house"
         case .mealPlan: return "calendar"
+        case .timetable: return "clock"
         case .barcode: return "person.text.rectangle"
         case .more: return "ellipsis"
         }
@@ -27,6 +29,8 @@ enum AppTab: String, CaseIterable {
         switch self {
         case .home: HomeView()
         case .mealPlan: MealPlanView()
+//        case .timetable: TimetableView()
+        case .timetable: Text("Coming Soon")
         case .barcode: BarcodeView()
         case .more: MoreView()
         }
@@ -68,6 +72,8 @@ struct ContentView: View {
                         HomeView()
                     case .mealPlan:
                         MealPlanView()
+                    case.timetable:
+                        TimetableView()
                     case .barcode:
                         BarcodeView()
                     case .more:
