@@ -7,43 +7,99 @@
 
 import SwiftUI
 
-class TimetableSettingsViewModel: ObservableObject {
-    @Published var selectedGrade: Int = 1
-    @Published var selectedClass: Int = 1
+struct SubjectSettingsView: View {
+    @EnvironmentObject private var viewModel: TimetableViewModel
     
-    
-}
-
-struct TimetableSettingsView: View {
-    @StateObject private var viewModel = TimetableSettingsViewModel()
+    @State private var subjects: [String] = ["공강", "예배"]
     
     var body: some View {
         List {
-            Section {
-                Picker("학년", selection: $viewModel.selectedGrade) {
-                    ForEach(1..<4) { grade in
-                        Text("\(grade)학년").tag(grade)
-                    }
-                }
-                
-                Picker("반", selection: $viewModel.selectedClass) {
-                    ForEach(1..<11) { `class` in
-                        Text("\(`class`)반").tag(`class`)
-                    }
+            ForEach($subjects, id: \.self) { $subject in
+                NavigationLink(subject) {
+                    EditSubjectView(subject: $subject)
+                        .environmentObject(viewModel)
                 }
             }
-            
-            Section {
-                NavigationLink("선택과목 설정") {
-                    EmptyView()
-                }
+            .onDelete { indexSet in
+                subjects.remove(atOffsets: indexSet)
             }
         }
-        .navigationTitle("시간표 설정")
+        .toolbar {
+            EditButton()
+            NavigationLink {
+                AddSubjectView(subjects: $subjects)
+            } label: {
+                Label("추가", systemImage: "plus")
+            }
+        }
+        .navigationTitle("과목 설정")
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private struct AddSubjectView: View {
+        @Environment(\.dismiss) private var dismiss
+        
+        @Binding var subjects: [String]
+        @State private var name = ""
+        
+        var body: some View {
+            List {
+                Section {
+                    TextField("과목명", text: $name)
+                }
+            }
+            .navigationTitle("과목 추가")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                Button("저장") {
+                    if !name.isEmpty {
+                        subjects.append(name)
+                        dismiss()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(name.isEmpty)
+            }
+        }
+    }
+    
+    private struct EditSubjectView: View {
+        @EnvironmentObject private var viewModel: TimetableViewModel
+        
+        @Binding var subject: String
+        
+        @State private var selectedEntries: [TimetableEntry] = []
+
+        var body: some View {
+            List {
+                Section {
+                    TextField("과목명", text: $subject)
+                }
+                
+                Section {
+                    TimetableGridView(
+                        entries: !viewModel.isTimetableEmpty ? viewModel.entries : TimetableEntry.sampleTimetable,
+                        onCellTap: { day, period in
+                            let entry = TimetableEntry(day: day, period: period, subject: subject)
+                            
+                            if let idx = selectedEntries.firstIndex(where: { $0.day == day && $0.period == period }) {
+                                selectedEntries.remove(at: idx)
+                            } else {
+                                selectedEntries.append(entry)
+                            }
+                            
+                            print(selectedEntries)
+                        }
+                    )
+                }
+            }
+            .navigationTitle(subject)
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
 #Preview {
-    TimetableSettingsView()
+    SubjectSettingsView()
 }
+

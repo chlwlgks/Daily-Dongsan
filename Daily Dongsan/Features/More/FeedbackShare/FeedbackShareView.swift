@@ -11,12 +11,8 @@ struct FeedbackShareView: View {
     var body: some View {
         List {
             Section("Instagram") {
-                Button("최지한: j12han") {
-                    UIApplication.shared.open(URL(string: "https://www.instagram.com/j12han/")!)
-                }
-                Button("김병윤: ellio__ot") {
-                    UIApplication.shared.open(URL(string: "https://www.instagram.com/ellio__ot/")!)
-                }
+                Link("최지한: j12han", destination: URL(string: "https://www.instagram.com/j12han/")!)
+                Link("김병윤: ellio__ot", destination: URL(string: "https://www.instagram.com/ellio__ot/")!)
             }
             
             if MailComposeViewController.canSendMail {

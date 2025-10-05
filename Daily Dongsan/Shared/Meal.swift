@@ -7,9 +7,22 @@
 
 import Foundation
 
+enum MealKind: String, Codable, Hashable {
+    case breakfast = "1"
+    case lunch = "2"
+    case dinner = "3"
+    
+    var displayName: String {
+        switch self {
+        case .breakfast: return "조식"
+        case .lunch: return "중식"
+        case .dinner: return "석식"
+        }
+    }
+}
+
 struct Meal: Hashable {
-    let mealCode: String
-    let mealType: String
+    let mealKind: MealKind
     var menus: [Menu]?
     var calorieInfo: String?
 }
@@ -22,8 +35,7 @@ struct Menu: Hashable {
 extension Meal {
     static let sampleMeals: [Meal] = [
         Meal(
-            mealCode: "1",
-            mealType: "조식",
+            mealKind: .breakfast,
             menus: [
                 Menu(name: "크로와상샌드위치", allergies: ["1", "2", "5", "6", "10", "12"]),
                 Menu(name: "햄야채볶음밥", allergies: ["2", "5", "6", "10", "15", "16", "18"]),
@@ -34,8 +46,7 @@ extension Meal {
             ]
         ),
         Meal(
-            mealCode: "2",
-            mealType: "중식",
+            mealKind: .lunch,
             menus: [
                 Menu(name: "랍스터버터구이", allergies: ["2", "5", "6", "9", "13"]),
                 Menu(name: "스파게티", allergies: ["1", "2", "5", "6", "10", "12", "13", "15", "16"]),
@@ -50,8 +61,7 @@ extension Meal {
             calorieInfo: "1034.7 Kcal"
         ),
         Meal(
-            mealCode: "3",
-            mealType: "석식",
+            mealKind: .dinner,
             menus: [
                 Menu(name: "잡곡밥", allergies: nil),
                 Menu(name: "부대찌개&라면사리", allergies: ["5", "6", "9", "10", "15"]),
@@ -63,24 +73,4 @@ extension Meal {
             ]
         )
     ]
-}
-
-struct Mealresponse: Codable {
-    let mealServiceDietInfo: [MealServiceDietInfo]
-}
-
-struct MealServiceDietInfo: Codable {
-    let row: [MealRow]?
-}
-
-struct MealRow: Codable {
-    let MMEAL_SC_CODE: String // 식사코드
-    let MMEAL_SC_NM: String // 식사명
-    let DDISH_NM: String // 요리명
-    let CAL_INFO: String // 칼로리정보
-}
-
-struct Allergy: Identifiable {
-    let id: String
-    let name: String
 }

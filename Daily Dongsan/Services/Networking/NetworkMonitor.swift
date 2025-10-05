@@ -11,8 +11,11 @@ import Network
 class NetworkMonitor: ObservableObject {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "Monitor")
-    
     @Published var isConnected: Bool = true
+    
+    init() {
+        startMonitoring()
+    }
     
     func startMonitoring() {
         monitor.start(queue: queue)

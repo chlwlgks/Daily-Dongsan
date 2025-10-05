@@ -19,7 +19,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct Daily_DongsanApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     @AppStorage("showOnboardingView") private var showOnboardingView = true
+    
     @StateObject var networkMonitor = NetworkMonitor()
     
     var body: some Scene {
@@ -27,19 +29,15 @@ struct Daily_DongsanApp: App {
             VStack(spacing: 0) {
                 if !networkMonitor.isConnected {
                     NoInternetView()
-                        .transition(.move(edge: .top))
                 }
                 
                 ContentView()
-            }
-            .onAppear {
-                networkMonitor.startMonitoring()
             }
             .sheet(isPresented: $showOnboardingView) {
                 OnboardingView()
                     .interactiveDismissDisabled()
             }
-            .animation(.easeInOut(duration: 0.5), value: networkMonitor.isConnected)
+            .animation(.default, value: networkMonitor.isConnected)
         }
     }
 }

@@ -8,75 +8,62 @@
 import SwiftUI
 
 struct TimetableView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    
     @StateObject private var viewModel = TimetableViewModel()
-    private let weekdays = Weekday.allCases
-    @State private var maxRowHeight: CGFloat = 0
     
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    if viewModel.isTimetableLoading {
-                        ProgressView()
-                            .padding()
+                    if viewModel.isTimetableEmpty {
+                        Text("시간표 정보가 없습니다.")
                             .frame(maxWidth: .infinity, alignment: .center)
                     } else {
-                        Grid {
-                            GridRow {
-                                Text("")
-                                ForEach(weekdays, id: \.self) {day in
-                                    Text(day.title)
-                                }
-                            }
-                            .font(.system(.subheadline, weight: .semibold))
-                            
-                            Divider()
-                            
-                            ForEach(1...7, id: \.self) { period in
-                                GridRow {
-                                    Text("\(period)")
-                                        .fontWeight(.semibold)
-                                    ForEach(weekdays, id: \.self) { day in
-                                        Text(viewModel.subject(for: day, period: String(period)))
-                                            .fixedSize(horizontal: false, vertical: true)
-                                            .multilineTextAlignment(.center)
+                        TimetableGridView(entries: viewModel.entries)
+                            .applyIf(viewModel.isTimetableLoading) { view in
+                                view.hidden()
+                                    .overlay {
+                                        ProgressView()
+                                            .id(UUID())
                                     }
-                                }
-                                .font(.subheadline)
-                                .background(
-                                    GeometryReader { proxy in
-                                        Color.clear
-                                            .preference(key: MaxRowHeightKey.self, value: proxy.size.height)
-                                    }
-                                )
-                                .frame(height: maxRowHeight)
-                                
-                                if period < 7 {
-                                    Divider()
-                                }
                             }
-                        }
-                        .onPreferenceChange(MaxRowHeightKey.self) { value in
-                            maxRowHeight = value
-                        }
                     }
                 }
                 
                 Section {
-                    NavigationLink("시간표 설정") {
-                        TimetableSettingsView()
+                    Picker("학년", selection: $viewModel.selectedGrade) {
+                        ForEach(1...3, id: \.self) { grade in
+                            Text("\(grade)학년")
+                                .tag(grade)
+                        }
                     }
+                    Picker("반", selection: $viewModel.selectedClass) {
+                        ForEach(1...12, id: \.self) { cls in
+                            Text("\(cls)반")
+                                .tag(cls)
+                        }
+                    }
+                    
+                    NavigationLink("과목 설정") {
+                        SubjectSettingsView()
+                            .environmentObject(viewModel)
+                    }
+                    .disabled(true)
+                } footer: {
+                    Text("과목 설정은 iOS 17 이상에서 지원됩니다.")
                 }
             }
             .navigationTitle("시간표")
+            .applyNavigationSubtitleIfAvailable("\(viewModel.selectedGrade)학년 \(viewModel.selectedClass)반")
+            .onChange(of: scenePhase) { newValue in
+                Task {
+                    if newValue == .active {
+                        await viewModel.fetchTimetable(containing: Date())
+                    }
+                }
+            }
         }
-    }
-}
-
-private struct MaxRowHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
     }
 }
 

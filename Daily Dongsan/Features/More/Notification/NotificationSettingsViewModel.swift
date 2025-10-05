@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-enum NotificationMeal: String {
-    case breakfast
-    case lunch
-    case dinner
+private enum NotificationMeal: String {
+    case breakfast, lunch, dinner
 }
 
 class NotificationSettingsViewModel: ObservableObject {
@@ -39,14 +37,17 @@ class NotificationSettingsViewModel: ObservableObject {
     init() {
         breakfastNotificationEnabled = UserDefaults.standard.bool(forKey: "breakfastNotificationEnabled")
         breakfastNotificationTime = (UserDefaults.standard.object(forKey: "breakfastNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+        
         lunchNotificationEnabled = UserDefaults.standard.bool(forKey: "lunchNotificationEnabled")
         lunchNotificationTime = (UserDefaults.standard.object(forKey: "lunchNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+        
         dinnerNotificationEnabled = UserDefaults.standard.bool(forKey: "dinnerNotificationEnabled")
         dinnerNotificationTime = (UserDefaults.standard.object(forKey: "dinnerNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
-        fetchAuthorizationStatus()
+        
+        refreshAuthorizationStatus()
     }
     
-    func fetchAuthorizationStatus() {
+    private func refreshAuthorizationStatus() {
         let center = UNUserNotificationCenter.current()
         center.getNotificationSettings { settings in
             DispatchQueue.main.async {
@@ -54,10 +55,18 @@ class NotificationSettingsViewModel: ObservableObject {
                     self.notificationAuthorizationStatus = settings.authorizationStatus
                 }
             }
-            
-            if settings.authorizationStatus == .notDetermined {
-                center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        }
+    }
+    
+    func requestAuthorizationIfNeeded() {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else {
+                self.refreshAuthorizationStatus()
+                return
             }
+            
+            center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
         }
     }
     
@@ -73,7 +82,6 @@ class NotificationSettingsViewModel: ObservableObject {
             switch meal {
             case .breakfast:
                 body = "조식 메뉴를 확인해 보세요. 🍴"
-                //                body = "조식 메뉴를 확인해 보세요. 🍽️"
             case .lunch:
                 body = "중식 메뉴를 확인해 보세요. 🍛"
             case .dinner:
@@ -111,12 +119,12 @@ class NotificationSettingsViewModel: ObservableObject {
     }
     
     private func cancelNotifications(idPrefix: String) {
-        let cetner = UNUserNotificationCenter.current()
-        cetner.getPendingNotificationRequests { requests in
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests { requests in
             let identifiers = requests
                 .map { $0.identifier }
                 .filter { $0.hasPrefix(idPrefix) }
-            cetner.removePendingNotificationRequests(withIdentifiers: identifiers)
+            center.removePendingNotificationRequests(withIdentifiers: identifiers)
         }
     }
 }

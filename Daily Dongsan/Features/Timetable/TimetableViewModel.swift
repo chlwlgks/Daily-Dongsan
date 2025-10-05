@@ -16,33 +16,34 @@ enum Weekday: Int, CaseIterable {
 }
 
 class TimetableViewModel: ObservableObject {
-    @Published var entries: [TimetableEntry] = []
     @Published var isTimetableLoading: Bool = true
+    @Published var isTimetableEmpty: Bool = false
+    
+    var entries: [TimetableEntry] = []
+    
+    @Published var selectedGrade: Int {
+        didSet {
+            UserDefaults.standard.set(selectedGrade, forKey: "selectedGrade")
+            Task {
+                await fetchTimetable(containing: Date())
+            }
+        }
+    }
+    @Published var selectedClass: Int {
+        didSet {
+            UserDefaults.standard.set(selectedClass, forKey: "selectedClass")
+            Task {
+                await fetchTimetable(containing: Date())
+            }
+        }
+    }
     
     init() {
+        selectedGrade = UserDefaults.standard.object(forKey: "selectedGrade") as? Int ?? 1
+        selectedClass = UserDefaults.standard.object(forKey: "selectedClass") as? Int ?? 1
+        
         Task {
-            await fetchWeekTimetable(containing: Date())
-        }
-    }
-
-    func subject(for day: Weekday, period: String) -> String {
-        return entries.first { $0.day == day && $0.period == period }?.subject ?? ""
-    }
-    
-    func fetchWeekTimetable(containing date: Date) async {
-        let calendar = Calendar(identifier: .gregorian)
-        let monday = mondayOfWeek(containing: date)
-        
-        for offset in 0..<5 {
-            if let day = calendar.date(byAdding: .day, value: offset, to: monday) {
-                await fetchTimetable(for: day)
-            }
-        }
-        
-        Task { @MainActor in
-            withAnimation {
-                isTimetableLoading = false
-            }
+            await fetchTimetable(containing: Date())
         }
     }
     
@@ -53,46 +54,10 @@ class TimetableViewModel: ObservableObject {
         return calendar.date(byAdding: .day, value: daysFromMonday, to: calendar.startOfDay(for: date))!
     }
     
-    private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
-    
-    func fetchTimetable(for date: Date) async {
-        let dateformatter = DateFormatter()
-        dateformatter.dateFormat = "yyyyMMdd"
-        let formattedDate = dateformatter.string(from: date)
-        
-//        let url = URL(string: "https://open.neis.go.kr/hub/hisTimetable?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&ALL_TI_YMD=\(formattedDate)&GRADE=3&CLASS_NM=12")!
-        let url = URL(string: "https://open.neis.go.kr/hub/hisTimetable?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&ALL_TI_YMD=\(formattedDate)&GRADE=3&CLASS_NM=12")!
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            
-            let decoder = JSONDecoder()
-            let response = try decoder.decode(HisTimetableResponse.self, from: data)
-            
-            applyDecodedResponse(response)
-        } catch {
-            print("시간표 로드 오류: \(error.localizedDescription)")
-        }
-    }
-    
-    private func applyDecodedResponse(_ response: HisTimetableResponse) {
-        let rows = response.hisTimetable[1].row!
-        for row in rows {
-            let day = weekday(from: row.ALL_TI_YMD)
-            let period = row.PERIO
-            let subject = row.ITRT_CNTNT
-            
-            Task { @MainActor in
-                entries.removeAll { $0.day == day && $0.period == period }
-                entries.append(TimetableEntry(day: day!, period: period, subject: subject))
-            }
-        }
-    }
-    
     private func weekday(from yyyyMMdd: String) -> Weekday? {
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "yyyyMMdd"
-        dateformatter.timeZone = TimeZone(abbreviation: "KST")
+        dateformatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         
         let date = dateformatter.date(from: yyyyMMdd)
         let weekday = Calendar(identifier: .gregorian).component(.weekday, from: date!)
@@ -105,5 +70,60 @@ class TimetableViewModel: ObservableObject {
         case 6: return .friday
         default: return nil
         }
+    }
+    
+    private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
+    func fetchTimetable(containing date: Date) async {
+        await updateTimetableState(loading: true, isEmpty: false)
+        
+        let monday = mondayOfWeek(containing: date)
+        
+        let calendar = Calendar(identifier: .gregorian)
+        let friday = calendar.date(byAdding: .day, value: 4, to: monday)!
+        
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "yyyyMMdd"
+        
+        let from = dateformatter.string(from: monday)
+        let to = dateformatter.string(from: friday)
+        
+        let url = URL(string: "https://open.neis.go.kr/hub/hisTimetable?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&GRADE=\(selectedGrade)&CLASS_NM=\(selectedClass)&TI_FROM_YMD=\(from)&TI_TO_YMD=\(to)")!
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(HisTimetableResponse.self, from: data)
+            
+            let rows = response.hisTimetable[1].row!
+            
+            var newEntries: [TimetableEntry] = []
+            for row in rows {
+                let day = weekday(from: row.ALL_TI_YMD)
+                let period = Int(row.PERIO)!
+                let subject = row.ITRT_CNTNT
+                
+                newEntries.append(TimetableEntry(day: day!, period: period, subject: subject))
+            }
+            
+            await updateEntries(newEntries)
+            await updateTimetableState(loading: false, isEmpty: false)
+        } catch {
+            await updateTimetableState(loading: false, isEmpty: true)
+            print("시간표 로드 오류: \(error.localizedDescription)")
+        }
+    }
+    
+    @MainActor
+    private func updateTimetableState(loading: Bool, isEmpty: Bool) {
+        withAnimation {
+            isTimetableLoading = loading
+            isTimetableEmpty = isEmpty
+        }
+    }
+    
+    @MainActor
+    private func updateEntries(_ entries: [TimetableEntry]) {
+        self.entries = entries
     }
 }

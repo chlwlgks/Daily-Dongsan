@@ -11,7 +11,10 @@ struct NotificationSettingsView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var viewModel =  NotificationSettingsViewModel()
+    
+    @EnvironmentObject private var viewModel: NotificationSettingsViewModel
+    
+    @State private var showResetAlert: Bool = false
     
     var body: some View {
         Form {
@@ -21,40 +24,39 @@ struct NotificationSettingsView: View {
                         Text("데일리 동산의 알림이 허용되어 있지 않습니다.")
                             .foregroundStyle(.red)
                         Button("설정에서 권한 허용하기") {
-                            let url = URL(string: "app-settings:notifications")!
+                            let url = URL(string: UIApplication.openNotificationSettingsURLString)!
                             openURL(url)
                         }
                     }
-                    .font(.subheadline)
                     .frame(maxWidth: .infinity)
                 }
             }
             
             Group {
                 Section {
-                    Toggle(isOn: $viewModel.breakfastNotificationEnabled) {
-                        Text("조식 알림")
-                    }
+                    Toggle("조식 알림", isOn: $viewModel.breakfastNotificationEnabled)
                     DatePicker("시간", selection: $viewModel.breakfastNotificationTime, displayedComponents: .hourAndMinute)
                 }
                 Section {
-                    Toggle(isOn: $viewModel.lunchNotificationEnabled) {
-                        Text("중식 알림")
-                    }
+                    Toggle("중식 알림", isOn: $viewModel.lunchNotificationEnabled)
                     DatePicker("시간", selection: $viewModel.lunchNotificationTime, displayedComponents: .hourAndMinute)
                 }
                 Section {
-                    Toggle(isOn: $viewModel.dinnerNotificationEnabled) {
-                        Text("석식 알림")
-                    }
+                    Toggle("석식 알림", isOn: $viewModel.dinnerNotificationEnabled)
                     DatePicker("시간", selection: $viewModel.dinnerNotificationTime, displayedComponents: .hourAndMinute)
                 }
             }
             .disabled(viewModel.notificationAuthorizationStatus != .authorized)
             
             Section {
-                NavigationLink("'🍽️'가 포함된 알림이 오는 경우") {
-                    ResetNotificationsView(viewModel: viewModel)
+                Button("알림 재설정") {
+                    showResetAlert = true
+                }
+                .alert("알림 재설정", isPresented: $showResetAlert) {
+                    Button("취소", role: .cancel) {}
+                    Button("알림 재설정", role: .destructive, action: performReset)
+                } message: {
+                    Text("이 작업은 알림 설정을 초기 설정으로 재설정합니다.")
                 }
             }
         }
@@ -62,49 +64,26 @@ struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: scenePhase) { newPhase in
             if newPhase == .active {
-                viewModel.fetchAuthorizationStatus()
+                viewModel.requestAuthorizationIfNeeded()
             }
+        }
+        .onAppear {
+            viewModel.requestAuthorizationIfNeeded()
         }
     }
-}
-
-struct ResetNotificationsView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var viewModel: NotificationSettingsViewModel
     
-    var body: some View {
-        Form {
-            Section {
-                Text("""
-                    일부 기기에서 '🍽️' 이모티콘이 포함된 이전 버전의 알림이 오는 오류가 확인됐습니다.
-                    이전 버전의 알림이 올 때에는 아래 버튼을 눌러 알림을 초기화해 주세요.
-                    '🍴, 🍛, 😋' 이모티콘이 포함된 알림은 해당 사항이 없습니다.
-                    """)
-                .font(.callout)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(10)
-                
-                Button {
-                    let center = UNUserNotificationCenter.current()
-                    center.removeAllPendingNotificationRequests()
-                    
-                    viewModel.breakfastNotificationEnabled = false
-                    viewModel.breakfastNotificationTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
-                    viewModel.lunchNotificationEnabled = false
-                    viewModel.lunchNotificationTime = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
-                    viewModel.dinnerNotificationEnabled = false
-                    viewModel.dinnerNotificationTime = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
-                    
-                    dismiss()
-                    HapticManager.instance.notification(notificationType: .success)
-                } label: {
-                    Text("알림 초기화")
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
-            }
-        }
-        .navigationTitle("'🍽️'가 포함된 알림이 오는 경우")
-        .navigationBarTitleDisplayMode(.inline)
+    private func performReset() {
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+
+        viewModel.breakfastNotificationEnabled = false
+        viewModel.breakfastNotificationTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+        viewModel.lunchNotificationEnabled = false
+        viewModel.lunchNotificationTime = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+        viewModel.dinnerNotificationEnabled = false
+        viewModel.dinnerNotificationTime = Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
+
+        HapticManager.instance.notification(notificationType: .success)
     }
 }
 

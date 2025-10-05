@@ -7,59 +7,100 @@
 
 import FirebaseFirestore
 
+struct Mealresponse: Codable {
+    let mealServiceDietInfo: [MealServiceDietInfo]
+}
+
+struct MealServiceDietInfo: Codable {
+    let row: [MealRow]?
+}
+
+struct MealRow: Codable {
+    let MMEAL_SC_CODE: String // 식사코드
+    let MMEAL_SC_NM: String // 식사명
+    let DDISH_NM: String // 요리명
+    let CAL_INFO: String // 칼로리정보
+}
+
 class FetchMeals {
     private let apiKey: String = Bundle.main.infoDictionary!["API Key"] as! String
-    
-    private let mealTimes: [String : String] = ["1" : "조식", "2" : "중식", "3" : "석식"]
     
     func fetchMeals(for date: Date) async -> [Meal] {
 //        let date = Calendar.current.date(from: DateComponents(year: 2025, month: 5, day: 15))!
         
         var meals: [Meal] = [
-            Meal(mealCode: "1", mealType: "조식"),
-            Meal(mealCode: "2", mealType: "중식"),
-            Meal(mealCode: "3", mealType: "석식")
+            Meal(mealKind: .breakfast),
+            Meal(mealKind: .lunch),
+            Meal(mealKind: .dinner)
         ]
         
-        // MARK: - 조식, 석식
-        for mealCode in ["1", "3"] {
-            let mealType = mealTimes[mealCode]!
-            
-            let db = Firestore.firestore()
-            
-            let yearFormatter = DateFormatter()
-            yearFormatter.dateFormat = "yyyy"
-            let year = yearFormatter.string(from: date)
-            
-            let monthFormatter = DateFormatter()
-            monthFormatter.dateFormat = "MM"
-            let month = monthFormatter.string(from: date)
-            
-            let dayFormatter = DateFormatter()
-            dayFormatter.dateFormat = "d"
-            let day = dayFormatter.string(from: date)
-            
-            do {
-                var mealName = try await db.collection("meals").document(year).collection(month).document(day).getDocument().data()?[mealType] as? String? ?? nil
-                if mealName != nil {
-                    mealName = mealName!.replacingOccurrences(of: ",", with: ".")
-                    mealName = mealName!.replacingOccurrences(of: "\\n", with: "<br/>")
-                    
-                    if let index = meals.firstIndex(where: { $0.mealCode == mealCode }) {
-                        meals[index].menus = parseMeals(from: mealName!)
-                    }
-                }
-            } catch {
-                print("\(mealType) 로드 오류: \(error.localizedDescription)")
-            }
+        async let bdResult = fetchBreakfastAndDinner(for: date)
+        async let lunchResult = fetchLunch(for: date)
+        
+        let (bd, lunch) = await (bdResult, lunchResult)
+        
+        if let breakfast = bd?["1"], let idx = meals.firstIndex(where: { $0.mealKind.rawValue == "1" }) {
+            meals[idx].menus = breakfast
+        }
+        if let dinner = bd?["3"], let idx = meals.firstIndex(where: { $0.mealKind.rawValue == "3" }) {
+            meals[idx].menus = dinner
+        }
+        if let lunch, let idx = meals.firstIndex(where: { $0.mealKind.rawValue == "2" }) {
+            meals[idx].menus = lunch.menus
+            meals[idx].calorieInfo = lunch.calorie
         }
         
-// MARK: - 중식
+        return meals
+    }
+    
+    private func fetchBreakfastAndDinner(for date: Date) async -> [String: [Menu]]? {
+        let db = Firestore.firestore()
+        
+        let yearFormatter = DateFormatter()
+        yearFormatter.dateFormat = "yyyy"
+        let year = yearFormatter.string(from: date)
+        
+        let monthFormatter = DateFormatter()
+        monthFormatter.dateFormat = "MM"
+        let month = monthFormatter.string(from: date)
+        
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "dd"
+        let day = dayFormatter.string(from: date)
+        
+        do {
+            let data = try await db
+                .collection("meals").document(year)
+                .collection(month).document(day)
+                .getDocument().data()
+            guard let data else { return nil }
+            
+            var result: [String: [Menu]] = [:]
+            for mealCode in ["1", "3"] {
+                guard let mealType = MealKind(rawValue: mealCode)?.displayName else { continue }
+                
+                if var mealName = data[mealType] as? String {
+                    mealName = mealName.replacingOccurrences(of: ",", with: ".")
+                    mealName = mealName.replacingOccurrences(of: "\\n", with: "<br/>")
+                    
+                    result[mealCode] = parseMeals(from: mealName)
+                }
+            }
+            
+            return result
+        } catch {
+            print("Firestore 로드 오류: \(error.localizedDescription)")
+        }
+        
+        return nil
+    }
+    
+    private func fetchLunch(for date: Date) async -> (menus: [Menu], calorie: String?)? {
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "yyyyMMdd"
         let formattedDate = dateformatter.string(from: date)
         
-        let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(formattedDate)")!
+        guard let url = URL(string: "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=\(apiKey)&Type=json&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7530184&MLSV_YMD=\(formattedDate)") else { return nil }
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
@@ -67,18 +108,17 @@ class FetchMeals {
             let decoder = JSONDecoder()
             let response = try decoder.decode(Mealresponse.self, from: data)
             
-            let rows = response.mealServiceDietInfo[1].row!
-            for row in rows {
-                if let index = meals.firstIndex(where: { $0.mealCode == row.MMEAL_SC_CODE }) {
-                    meals[index].menus = parseMeals(from: row.DDISH_NM)
-                    meals[index].calorieInfo = row.CAL_INFO
+            if let rows = response.mealServiceDietInfo[1].row {
+                if let row = rows.first(where: { $0.MMEAL_SC_CODE == "2" }) {
+                    let menus = parseMeals(from: row.DDISH_NM)
+                    return (menus, row.CAL_INFO)
                 }
             }
         } catch {
             print("중식 로드 오류: \(error.localizedDescription)")
         }
         
-        return meals
+        return nil
     }
     
     private func parseMeals(from meal: String) -> [Menu] {

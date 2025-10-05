@@ -12,7 +12,7 @@ struct NoInternetView: View {
     
     var body: some View {
         HStack {
-            if #available(iOS 17, *) {
+            if #available(iOS 17.0, *) {
                 TimelineView(.periodic(from: .now, by: 2)) { context in
                     let index = Int(context.date.timeIntervalSinceReferenceDate / 2) % symbols.count
                     ZStack {
@@ -24,7 +24,7 @@ struct NoInternetView: View {
                         }
                     }
                     .frame(width: 20, height: 20)
-                    .animation(.easeInOut(duration: 0.5), value: index)
+                    .animation(.easeInOut, value: index)
                 }
             }
             Text("인터넷 연결 없음")

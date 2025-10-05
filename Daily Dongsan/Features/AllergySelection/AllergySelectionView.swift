@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AllergySelectionView: View {
-    @StateObject private var viewModel = AllergySelectionViewModel()
+    @EnvironmentObject private var viewModel: AllergySelectionViewModel
     
     var body: some View {
         List(viewModel.allergies) { allergy in
@@ -25,9 +25,7 @@ struct AllergySelectionView: View {
                             .fontWeight(.semibold)
                     }
                 }
-                .contentShape(
-                    Rectangle()
-                )
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
