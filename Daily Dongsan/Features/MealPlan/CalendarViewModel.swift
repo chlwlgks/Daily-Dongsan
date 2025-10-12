@@ -7,17 +7,26 @@
 
 import SwiftUI
 
-class CalendarViewModel: ObservableObject {
-    @Published var isLoading: Bool = false
+@Observable
+class CalendarViewModel {
+    var isLoading: Bool = false
     
-    @Published var selectedDate = Date()
+    var selectedDate = Date()
+    var meals: [Meal] = []
     
-    @Published var meals: [Meal] = []
-    
-    func selectedDateAsString() -> String {
+    var selectedDateAsString: String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "MMM d일 EEEE"
+        
+        let calendar = Calendar.current
+        let selectedYear = calendar.component(.year, from: selectedDate)
+        let currentYear = calendar.component(.year, from: Date())
+        
+        if selectedYear == currentYear {
+            dateFormatter.dateFormat = "M월 d일 EEEE"
+        } else {
+            dateFormatter.dateFormat = "yyyy년 M월 d일 EEEE"
+        }
+        
         return dateFormatter.string(from: selectedDate)
     }
     
@@ -36,7 +45,10 @@ class CalendarViewModel: ObservableObject {
         }
     }
     
-    private let selectedAllergies = Set(UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? [])
+    var selectedAllergies: Set<String> {
+        let ids = UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? []
+        return Set(ids)
+    }
     func attributedMenuList(for menus: [Menu]) -> AttributedString {
         var result = AttributedString()
         
@@ -57,3 +69,4 @@ class CalendarViewModel: ObservableObject {
         return result
     }
 }
+

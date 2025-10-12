@@ -8,14 +8,25 @@
 import SwiftUI
 import FirebaseFirestore
 
-class HomeViewModel: ObservableObject {
-    @AppStorage("showNextDayAfter7PM") var showNextDayAfter7PM = true
-    @AppStorage("skipWeekends") var skipWeekends = true
+@Observable
+class HomeViewModel {
+    var showNextDayAfter7PM: Bool {
+        get {
+            access(keyPath: \.showNextDayAfter7PM)
+            return UserDefaults.standard.object(forKey: "showNextDayAfter7PM") as? Bool ?? true
+        }
+    }
+    var skipWeekends: Bool {
+        get {
+            access(keyPath: \.skipWeekends)
+            return UserDefaults.standard.object(forKey: "skipWeekends") as? Bool ?? true
+        }
+    }
     
-    @Published var isMealsLoading: Bool = false
+    var isMealsLoading: Bool = false
     
-    @Published var announcement: String?
-    @Published var meals: [Meal] = []
+    var announcement: String?
+    var meals: [Meal] = []
     
     private enum DateChangeReason {
         case none, nextDayAfter7PM, skipWeekends

@@ -43,7 +43,7 @@ struct StudentIDSetupView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .focused($isFocused)
-                        .onChange(of: input) { newValue in
+                        .onChange(of: input) { _, newValue in
                             input = newValue.uppercased()
                         }
                         .onSubmit {

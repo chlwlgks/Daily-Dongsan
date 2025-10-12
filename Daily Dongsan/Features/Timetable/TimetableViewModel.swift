@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 enum Weekday: Int, CaseIterable {
     case monday = 0, tuesday, wednesday, thursday, friday
@@ -15,35 +16,92 @@ enum Weekday: Int, CaseIterable {
     }
 }
 
-class TimetableViewModel: ObservableObject {
-    @Published var isTimetableLoading: Bool = true
-    @Published var isTimetableEmpty: Bool = false
+@Observable
+class TimetableViewModel {
+    var isTimetableLoading: Bool = true
+    var isTimetableEmpty: Bool = false
     
-    var entries: [TimetableEntry] = []
+    var entries: [TimetableEntry] = TimetableEntry.sampleTimetable
+    var baseEntries: [TimetableEntry]?
     
-    @Published var selectedGrade: Int {
-        didSet {
-            UserDefaults.standard.set(selectedGrade, forKey: "selectedGrade")
-            Task {
-                await fetchTimetable(containing: Date())
+    var lastSubjects: [Subject] = []
+    
+    var selectedGrade: Int {
+        get {
+            access(keyPath: \.selectedGrade)
+            return UserDefaults.standard.object(forKey: "selectedGrade") as? Int ?? 1
+        }
+        set {
+            withMutation(keyPath: \.selectedGrade) {
+                UserDefaults.standard.set(newValue, forKey: "selectedGrade")
+                Task {
+                    await fetchTimetable(containing: Date())
+                }
             }
         }
     }
-    @Published var selectedClass: Int {
-        didSet {
-            UserDefaults.standard.set(selectedClass, forKey: "selectedClass")
-            Task {
-                await fetchTimetable(containing: Date())
+    var selectedClass: Int {
+        get {
+            access(keyPath: \.selectedClass)
+            return UserDefaults.standard.object(forKey: "selectedClass") as? Int ?? 1
+        }
+        set {
+            withMutation(keyPath: \.selectedClass) {
+                UserDefaults.standard.set(newValue, forKey: "selectedClass")
+                Task {
+                    await fetchTimetable(containing: Date())
+                }
             }
         }
     }
     
-    init() {
-        selectedGrade = UserDefaults.standard.object(forKey: "selectedGrade") as? Int ?? 1
-        selectedClass = UserDefaults.standard.object(forKey: "selectedClass") as? Int ?? 1
-        
-        Task {
-            await fetchTimetable(containing: Date())
+    // Rebuilds `entries` by overlaying subject selections on top of `baseEntries`.
+    @MainActor
+    func rebuildEntries(editingOverride: (id: Subject.ID?, name: String, selections: [SubjectSelection])? = nil) {
+        let base = baseEntries ?? TimetableEntry.sampleTimetable
+        entries = Self.buildEntries(
+            subjects: lastSubjects,
+            base: base,
+            editingOverride: editingOverride
+        )
+    }
+
+    // Pure calculation logic moved from view into the view model for cohesion
+    private static func buildEntries(
+        subjects: [Subject],
+        base: [TimetableEntry],
+        editingOverride: (id: Subject.ID?, name: String, selections: [SubjectSelection])? = nil
+    ) -> [TimetableEntry] {
+        var selectionMap: [String: String] = [:]
+
+        for s in subjects {
+            if let override = editingOverride, s.id == override.id {
+                for sel in override.selections {
+                    let key = "\(sel.dayRaw)-\(sel.period)"
+                    selectionMap[key] = override.name
+                }
+            } else {
+                for sel in s.selections {
+                    let key = "\(sel.dayRaw)-\(sel.period)"
+                    selectionMap[key] = s.name
+                }
+            }
+        }
+
+        if let override = editingOverride, override.id == nil {
+            for sel in override.selections {
+                let key = "\(sel.dayRaw)-\(sel.period)"
+                selectionMap[key] = override.name
+            }
+        }
+
+        return base.map { baseEntry in
+            let key = "\(baseEntry.day.rawValue)-\(baseEntry.period)"
+            if let name = selectionMap[key] {
+                return TimetableEntry(day: baseEntry.day, period: baseEntry.period, subject: name)
+            } else {
+                return baseEntry
+            }
         }
     }
     
@@ -124,6 +182,8 @@ class TimetableViewModel: ObservableObject {
     
     @MainActor
     private func updateEntries(_ entries: [TimetableEntry]) {
-        self.entries = entries
+        self.baseEntries = entries
+        self.rebuildEntries()
     }
 }
+

@@ -12,15 +12,16 @@ struct NotificationSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     
-    @EnvironmentObject private var viewModel: NotificationSettingsViewModel
+    @Environment(NotificationSettingsViewModel.self) private var viewModel
     
     @State private var showResetAlert: Bool = false
     
     var body: some View {
+        @Bindable var viewModel = viewModel
         Form {
             if viewModel.notificationAuthorizationStatus != .authorized {
                 Section {
-                    VStack {
+                    VStack(alignment: .leading) {
                         Text("데일리 동산의 알림이 허용되어 있지 않습니다.")
                             .foregroundStyle(.red)
                         Button("설정에서 권한 허용하기") {
@@ -28,7 +29,6 @@ struct NotificationSettingsView: View {
                             openURL(url)
                         }
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
             
@@ -62,12 +62,8 @@ struct NotificationSettingsView: View {
         }
         .navigationTitle("알림")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: scenePhase) { newPhase in
-            if newPhase == .active {
-                viewModel.requestAuthorizationIfNeeded()
-            }
-        }
-        .onAppear {
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
             viewModel.requestAuthorizationIfNeeded()
         }
     }

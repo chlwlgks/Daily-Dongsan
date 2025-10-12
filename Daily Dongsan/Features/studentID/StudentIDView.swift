@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct BarcodeView: View {
-    @EnvironmentObject private var viewModel: StudentIDViewModel
+    @Environment(StudentIDViewModel.self) private var viewModel
     
     let content: String
     
@@ -47,7 +47,7 @@ struct StudentIDView: View {
     
     @AppStorage("studentID") private var studentID: String?
     
-    @StateObject private var viewModel = StudentIDViewModel()
+    @State private var viewModel = StudentIDViewModel()
     
     @State private var isShowingBarcodeSetupView = false
     
@@ -57,7 +57,7 @@ struct StudentIDView: View {
                 if let studentID {
                     Group {
                         BarcodeView(content: studentID)
-                            .environmentObject(viewModel)
+                            .environment(viewModel)
                             .applyIf(horizontalSizeClass == .regular) { view in
                                 view.frame(width: 370, height: 370 / 3)
                             }

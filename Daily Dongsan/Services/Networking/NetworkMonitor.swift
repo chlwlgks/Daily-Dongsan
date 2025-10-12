@@ -8,10 +8,11 @@
 import SwiftUI
 import Network
 
-class NetworkMonitor: ObservableObject {
+@Observable
+class NetworkMonitor {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "Monitor")
-    @Published var isConnected: Bool = true
+    var isConnected: Bool = true
     
     init() {
         startMonitoring()

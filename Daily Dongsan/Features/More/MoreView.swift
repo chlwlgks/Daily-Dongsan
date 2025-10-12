@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MoreView: View {
-    @StateObject private var notificationSettingsViewModel =  NotificationSettingsViewModel()
+    @State private var notificationSettingsViewModel =  NotificationSettingsViewModel()
     @AppStorage("breakfastNotificationEnabled") var breakfastNotificationEnabled = false
     @AppStorage("lunchNotificationEnabled") var lunchNotificationEnabled = false
     @AppStorage("dinnerNotificationEnabled") var dinnerNotificationEnabled = false
@@ -16,7 +16,7 @@ struct MoreView: View {
     @AppStorage("showNextDayAfter7PM") var showNextDayAfter7PM = true
     @AppStorage("skipWeekends") var skipWeekends = true
     
-    @StateObject private var allergySelectionViewModel = AllergySelectionViewModel()
+    @State private var allergySelectionViewModel = AllergySelectionViewModel()
     
     @AppStorage("studentID") var studentID: String?
     @State private var showResetIDConfirmation = false
@@ -35,7 +35,7 @@ struct MoreView: View {
                 Section {
                     NavigationLink {
                         NotificationSettingsView()
-                            .environmentObject(notificationSettingsViewModel)
+                            .environment(notificationSettingsViewModel)
                     } label: {
                         LabeledContent("알림") {
                             if notificationSettingsViewModel.notificationAuthorizationStatus == .authorized && (breakfastNotificationEnabled || lunchNotificationEnabled || dinnerNotificationEnabled) {
@@ -59,7 +59,7 @@ struct MoreView: View {
                 Section {
                     NavigationLink {
                         AllergySelectionView()
-                            .environmentObject(allergySelectionViewModel)
+                            .environment(allergySelectionViewModel)
                     } label: {
                         LabeledContent("알레르기 유발 식품 선택") {
                             if !allergySelectionViewModel.selectedAllergies.isEmpty {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AllergySelectionView: View {
-    @EnvironmentObject private var viewModel: AllergySelectionViewModel
+    @Environment(AllergySelectionViewModel.self) private var viewModel
     
     var body: some View {
         List(viewModel.allergies) { allergy in

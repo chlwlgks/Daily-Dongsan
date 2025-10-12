@@ -11,39 +11,77 @@ private enum NotificationMeal: String {
     case breakfast, lunch, dinner
 }
 
-class NotificationSettingsViewModel: ObservableObject {
-    @Environment(\.openURL) private var openURL
-    
-    @Published var notificationAuthorizationStatus: UNAuthorizationStatus = .authorized
-    @Published var breakfastNotificationEnabled: Bool {
-        didSet { persistAndSchedule(meal: .breakfast, enabled: breakfastNotificationEnabled, time: breakfastNotificationTime) }
+@Observable
+class NotificationSettingsViewModel {
+    var notificationAuthorizationStatus: UNAuthorizationStatus = .authorized
+    var breakfastNotificationEnabled: Bool {
+        get {
+            access(keyPath: \.breakfastNotificationEnabled)
+            return UserDefaults.standard.bool(forKey: "breakfastNotificationEnabled")
+        }
+        set {
+            withMutation(keyPath: \.breakfastNotificationEnabled) {
+                persistAndSchedule(meal: .breakfast, enabled: newValue, time: breakfastNotificationTime)
+            }
+        }
     }
-    @Published var breakfastNotificationTime: Date {
-        didSet { persistAndSchedule(meal: .breakfast, enabled: breakfastNotificationEnabled, time: breakfastNotificationTime) }
+    var breakfastNotificationTime: Date {
+        get {
+            access(keyPath: \.breakfastNotificationTime)
+            return (UserDefaults.standard.object(forKey: "breakfastNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+        }
+        set {
+            withMutation(keyPath: \.breakfastNotificationTime) {
+                persistAndSchedule(meal: .breakfast, enabled: breakfastNotificationEnabled, time: newValue)
+            }
+        }
     }
-    @Published var lunchNotificationEnabled: Bool {
-        didSet { persistAndSchedule(meal: .lunch, enabled: lunchNotificationEnabled, time: lunchNotificationTime) }
+    var lunchNotificationEnabled: Bool {
+        get {
+            access(keyPath: \.lunchNotificationEnabled)
+            return UserDefaults.standard.bool(forKey: "lunchNotificationEnabled")
+        }
+        set {
+            withMutation(keyPath: \.lunchNotificationEnabled) {
+                persistAndSchedule(meal: .lunch, enabled: newValue, time: lunchNotificationTime)
+            }
+        }
     }
-    @Published var lunchNotificationTime: Date {
-        didSet { persistAndSchedule(meal: .lunch, enabled: lunchNotificationEnabled, time: lunchNotificationTime) }
+    var lunchNotificationTime: Date {
+        get {
+            access(keyPath: \.lunchNotificationTime)
+            return (UserDefaults.standard.object(forKey: "lunchNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+        }
+        set {
+            withMutation(keyPath: \.lunchNotificationTime) {
+                persistAndSchedule(meal: .lunch, enabled: lunchNotificationEnabled, time: newValue)
+            }
+        }
     }
-    @Published var dinnerNotificationEnabled: Bool {
-        didSet { persistAndSchedule(meal: .dinner, enabled: dinnerNotificationEnabled, time: dinnerNotificationTime) }
+    var dinnerNotificationEnabled: Bool {
+        get {
+            access(keyPath: \.dinnerNotificationEnabled)
+            return UserDefaults.standard.bool(forKey: "dinnerNotificationEnabled")
+        }
+        set {
+            withMutation(keyPath: \.dinnerNotificationEnabled) {
+                persistAndSchedule(meal: .dinner, enabled: newValue, time: dinnerNotificationTime)
+            }
+        }
     }
-    @Published var dinnerNotificationTime: Date {
-        didSet { persistAndSchedule(meal: .dinner, enabled: dinnerNotificationEnabled, time: dinnerNotificationTime) }
+    var dinnerNotificationTime: Date {
+        get {
+            access(keyPath: \.dinnerNotificationTime)
+            return (UserDefaults.standard.object(forKey: "dinnerNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
+        }
+        set {
+            withMutation(keyPath: \.dinnerNotificationTime) {
+                persistAndSchedule(meal: .dinner, enabled: dinnerNotificationEnabled, time: newValue)
+            }
+        }
     }
     
     init() {
-        breakfastNotificationEnabled = UserDefaults.standard.bool(forKey: "breakfastNotificationEnabled")
-        breakfastNotificationTime = (UserDefaults.standard.object(forKey: "breakfastNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
-        
-        lunchNotificationEnabled = UserDefaults.standard.bool(forKey: "lunchNotificationEnabled")
-        lunchNotificationTime = (UserDefaults.standard.object(forKey: "lunchNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
-        
-        dinnerNotificationEnabled = UserDefaults.standard.bool(forKey: "dinnerNotificationEnabled")
-        dinnerNotificationTime = (UserDefaults.standard.object(forKey: "dinnerNotificationTime") as? Date) ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: Date())!
-        
         refreshAuthorizationStatus()
     }
     

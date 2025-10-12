@@ -22,7 +22,7 @@ struct Daily_DongsanApp: App {
     
     @AppStorage("showOnboardingView") private var showOnboardingView = true
     
-    @StateObject var networkMonitor = NetworkMonitor()
+    @State private var networkMonitor = NetworkMonitor()
     
     var body: some Scene {
         WindowGroup {
@@ -32,6 +32,7 @@ struct Daily_DongsanApp: App {
                 }
                 
                 ContentView()
+                    .modelContainer(for: Subject.self)
             }
             .sheet(isPresented: $showOnboardingView) {
                 OnboardingView()

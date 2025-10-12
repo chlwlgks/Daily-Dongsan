@@ -8,38 +8,21 @@
 import SwiftUI
 
 struct CalendarView: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
-    @StateObject private var viewModel = CalendarViewModel()
-    
-    private var formattedDate: String {
-        let dateFormatter = DateFormatter()
-        
-        let calendar = Calendar.current
-        let selectedYear = calendar.component(.year, from: viewModel.selectedDate)
-        let currentYear = calendar.component(.year, from: Date())
-        
-        if selectedYear == currentYear {
-            dateFormatter.dateFormat = "M월 d일 EEEE"
-        } else {
-            dateFormatter.dateFormat = "yyyy년 M월 d일 EEEE"
-        }
-        
-        return dateFormatter.string(from: viewModel.selectedDate)
-    }
+    @State private var viewModel = CalendarViewModel()
     
     var body: some View {
         NavigationStack {
             Group {
                 if horizontalSizeClass == .regular {
-                    RegularCalendarView()
+                    RegularCalendarView(viewModel: viewModel)
                 } else {
-                    CompactCalendarView()
+                    CompactCalendarView(viewModel: viewModel)
                 }
             }
-            .environmentObject(viewModel)
             .navigationTitle("캘린더")
-            .applyNavigationSubtitleIfAvailable(formattedDate)
+            .applyNavigationSubtitleIfAvailable(viewModel.selectedDateAsString)
             .navigationBarTitleDisplayMode(.inline)
             .task(id: viewModel.selectedDate) {
                 await viewModel.fetchMeals()
@@ -48,12 +31,7 @@ struct CalendarView: View {
     }
     
     private struct RegularCalendarView: View {
-        @EnvironmentObject private var viewModel: CalendarViewModel
-        
-        private let selectedAllergies: Set<String> = {
-            let ids = UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? []
-            return Set(ids)
-        }()
+        @Bindable var viewModel: CalendarViewModel
         
         var body: some View {
             HStack(alignment: .top) {
@@ -78,7 +56,7 @@ struct CalendarView: View {
                         if let menus = meal.menus, !menus.isEmpty {
                             VStack(alignment: .leading) {
                                 ForEach(menus, id: \.self) { menu in
-                                    if let list = menu.allergies, !list.isDisjoint(with: selectedAllergies) {
+                                    if let list = menu.allergies, !list.isDisjoint(with: viewModel.selectedAllergies) {
                                         Text(menu.name)
                                             .foregroundStyle(.red)
                                     } else {
@@ -121,7 +99,7 @@ struct CalendarView: View {
     }
     
     private struct CompactCalendarView: View {
-        @EnvironmentObject private var viewModel: CalendarViewModel
+        @Bindable var viewModel: CalendarViewModel
         
         var body: some View {
             VStack(spacing: 0) {

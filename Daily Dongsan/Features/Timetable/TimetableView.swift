@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TimetableView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @State private var hasLoadedInitialTimetable = false
     
-    @StateObject private var viewModel = TimetableViewModel()
+    @State private var viewModel = TimetableViewModel()
+    @Query(sort: \Subject.name) private var subjects: [Subject]
     
     var body: some View {
         NavigationStack {
@@ -45,22 +48,26 @@ struct TimetableView: View {
                         }
                     }
                     
-                    NavigationLink("과목 설정") {
-                        SubjectSettingsView()
-                            .environmentObject(viewModel)
-                    }
-                    .disabled(true)
-                } footer: {
-                    Text("과목 설정은 iOS 17 이상에서 지원됩니다.")
+//                    NavigationLink("과목 설정") {
+//                        SubjectSettingsView()
+//                            .environment(viewModel)
+//                    }
                 }
             }
             .navigationTitle("시간표")
             .applyNavigationSubtitleIfAvailable("\(viewModel.selectedGrade)학년 \(viewModel.selectedClass)반")
-            .onChange(of: scenePhase) { newValue in
+            .task {
+                if !hasLoadedInitialTimetable {
+                    viewModel.lastSubjects = subjects
+                    await viewModel.fetchTimetable(containing: Date())
+                    hasLoadedInitialTimetable = true
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else { return }
+                viewModel.lastSubjects = subjects
                 Task {
-                    if newValue == .active {
-                        await viewModel.fetchTimetable(containing: Date())
-                    }
+                    await viewModel.fetchTimetable(containing: Date())
                 }
             }
         }

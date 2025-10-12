@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct TimetableEntry: Identifiable {
-    let id = UUID()
+struct TimetableEntry: Identifiable, Equatable {
+    var id: String { "\(day.rawValue)-\(period)" }
     let day: Weekday
     let period: Int
     let subject: String

@@ -11,7 +11,8 @@ enum BarModule {
     case narrow, wide
 }
 
-class StudentIDViewModel: ObservableObject {
+@Observable
+class StudentIDViewModel {
     private let code39Patterns: [Character: [BarModule]] = [
         "*": [.narrow,   .wide, .narrow, .narrow,   .wide, .narrow,   .wide, .narrow, .narrow],
         "0": [.narrow, .narrow, .narrow,   .wide,   .wide, .narrow,   .wide, .narrow, .narrow],

@@ -11,7 +11,7 @@ struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
     
-    @StateObject private var viewModel = HomeViewModel()
+    @State private var viewModel = HomeViewModel()
     
     private func refresh() async {
         async let a: Void = viewModel.fetchMeals()
@@ -33,7 +33,7 @@ struct HomeView: View {
 //                    }
                     
                     RegularHomeView()
-                        .environmentObject(viewModel)
+                        .environment(viewModel)
                     Spacer()
                 } else {
 //                    if viewModel.isMealsLoading {
@@ -48,13 +48,12 @@ struct HomeView: View {
 //                    }
                     
                     CompactHomeView()
-                        .environmentObject(viewModel)
+                        .environment(viewModel)
                 }
             }
             .task(id: scenePhase) {
-                if scenePhase == .active {
-                    await refresh()
-                }
+                guard scenePhase == .active else { return }
+                await refresh()
             }
             .navigationTitle("안산동산고등학교")
             .applyNavigationSubtitleIfAvailable(viewModel.currentDateAsString())
@@ -75,12 +74,12 @@ struct HomeView: View {
                         .foregroundStyle(.accent)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
     }
     
     private struct CompactHomeView: View {
-        @EnvironmentObject private var viewModel: HomeViewModel
+        @Environment(HomeViewModel.self) private var viewModel
         
         private let selectedAllergies: Set<String> = {
             let ids = UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? []
@@ -142,7 +141,7 @@ struct HomeView: View {
     }
     
     private struct RegularHomeView: View {
-        @EnvironmentObject private var viewModel: HomeViewModel
+        @Environment(HomeViewModel.self) private var viewModel
         
         private let selectedAllergies: Set<String> = {
             let ids = UserDefaults.standard.array(forKey: "SelectedAllergies") as? [String] ?? []
@@ -150,11 +149,11 @@ struct HomeView: View {
         }()
         
         var body: some View {
-            VStack {
+            VStack(alignment: .leading) {
                 if #unavailable(iOS 26.0) {
                     Text(viewModel.currentDateAsString())
                         .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                 }
                 
                 if let announcement = viewModel.announcement, !announcement.isEmpty {

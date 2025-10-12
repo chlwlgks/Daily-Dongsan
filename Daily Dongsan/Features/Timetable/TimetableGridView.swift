@@ -9,23 +9,27 @@ import SwiftUI
 
 struct TimetableGridView: View {
     private let weekdays = Weekday.allCases
-    
     let entries: [TimetableEntry]
     let onCellTap: ((Weekday, Int) -> Void)?
+    let highlight: ((Weekday, Int) -> Bool)?
+    let maxPeriodLimit: Int?
 
-    init(entries: [TimetableEntry], onCellTap: ((Weekday, Int) -> Void)? = nil) {
+    init(entries: [TimetableEntry], onCellTap: ((Weekday, Int) -> Void)? = nil, highlight: ((Weekday, Int) -> Bool)? = nil, maxPeriodLimit: Int? = nil) {
         self.entries = entries
         self.onCellTap = onCellTap
+        self.highlight = highlight
+        self.maxPeriodLimit = maxPeriodLimit
     }
 
     private var maxPeriod: Int {
-        entries.compactMap { $0.period }.max() ?? 7
+        if let maxPeriodLimit { return maxPeriodLimit }
+        return entries.compactMap { $0.period }.max() ?? 8
     }
     private func subject(for day: Weekday, period: Int) -> String {
         return entries.first { $0.day == day && $0.period == period }?.subject ?? ""
     }
     
-    @State private var maxRowHeight: CGFloat = 0
+    @State private var maxRowHeight: CGFloat = 38
 
     var body: some View {
         Grid {
@@ -44,14 +48,23 @@ struct TimetableGridView: View {
                     Text("\(period)")
                         .fontWeight(.semibold)
                     ForEach(weekdays, id: \.self) { day in
-                        Text(subject(for: day, period: period))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.center)
-//                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-//                            .contentShape(Rectangle()) // 탭 영역 확장
-                            .onTapGesture {
-                                onCellTap?(day, period)
+                        let isSelected = highlight?(day, period) ?? false
+                        
+                        ZStack {
+                            if isSelected {
+                                Rectangle()
+                                    .fill(.accent.opacity(0.9))
+                                    .padding(-3)
                             }
+                            Text(subject(for: day, period: period))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            onCellTap?(day, period)
+                        }
                     }
                 }
                 .font(.subheadline)

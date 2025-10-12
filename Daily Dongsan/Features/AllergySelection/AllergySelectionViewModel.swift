@@ -5,14 +5,15 @@
 //  Created by 최지한 on 1/28/25.
 //
 
-import Foundation
+import SwiftUI
 
 struct Allergy: Identifiable {
     let id: String
     let name: String
 }
 
-class AllergySelectionViewModel: ObservableObject {
+@Observable
+class AllergySelectionViewModel {
     let allergies = [
             Allergy(id: "1", name: "알류"),
             Allergy(id: "2", name: "우유"),
@@ -37,23 +38,27 @@ class AllergySelectionViewModel: ObservableObject {
     
     private let key = "SelectedAllergies"
     
-    @Published var selectedAllergies: Set<String> = [] {
-        didSet {
-            let ids = Array(selectedAllergies)
-            UserDefaults.standard.set(ids, forKey: key)
+    var selectedAllergies: Set<String> {
+        get {
+            access(keyPath: \.selectedAllergies)
+            let ids = UserDefaults.standard.array(forKey: key) as? [String] ?? []
+            return Set(ids)
+        }
+        set {
+            withMutation(keyPath: \.selectedAllergies) {
+                let ids = Array(newValue)
+                UserDefaults.standard.set(ids, forKey: key)
+            }
         }
     }
     
-    init() {
-        let ids = UserDefaults.standard.array(forKey: key) as? [String] ?? []
-        selectedAllergies = Set(ids)
-    }
-    
     func toggleSelection(for allergyID: String) {
-        if selectedAllergies.contains(allergyID) {
-            selectedAllergies.remove(allergyID)
-        } else {
-            selectedAllergies.insert(allergyID)
+        withAnimation {
+            if selectedAllergies.contains(allergyID) {
+                selectedAllergies.remove(allergyID)
+            } else {
+                selectedAllergies.insert(allergyID)
+            }
         }
     }
 }
