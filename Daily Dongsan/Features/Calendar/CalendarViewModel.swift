@@ -12,6 +12,7 @@ class CalendarViewModel {
     var isLoading: Bool = false
     
     var selectedDate = Date()
+    var schedule: String?
     var meals: [Meal] = []
     
     var selectedDateAsString: String {
@@ -30,16 +31,23 @@ class CalendarViewModel {
         return dateFormatter.string(from: selectedDate)
     }
     
-    func fetchMeals() async {
+    func fetchScheduleAndMeals() async {
         await MainActor.run {
             withAnimation {
                 isLoading = true
             }
         }
-        let fetched = await FetchMeals().fetchMeals(for: selectedDate)
+        
+        async let scheduleTask = FetchSchedules().fetchSchedules(for: selectedDate)
+        async let mealsTask = FetchMeals().fetchMeals(for: selectedDate)
+        
+        let scheduleResult = await scheduleTask
+        let mealsResult = await mealsTask
+        
         await MainActor.run {
             withAnimation {
-                meals = fetched
+                schedule = scheduleResult
+                meals = mealsResult
                 isLoading = false
             }
         }
