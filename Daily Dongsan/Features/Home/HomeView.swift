@@ -14,7 +14,7 @@ struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     
     private func refresh() async {
-        async let a: Void = viewModel.fetchMeals()
+        async let a: Void = viewModel.fetchScheduleAndMeals()
         async let b: Void = viewModel.fetchAnnouncement()
         _ = await (a, b)
     }
@@ -23,34 +23,13 @@ struct HomeView: View {
         NavigationStack {
             Group {
                 if horizontalSizeClass == .regular {
-//                    if viewModel.isMealsLoading {
-//                        RegularHomeView(meals: Meal.sampleMeals)
-//                            .skeleton(isRedacted: true)
-//                        
-//                        ProgressView()
-//                    } else {
-//                        RegularHomeView(meals: viewModel.meals)
-//                    }
-                    
                     RegularHomeView()
-                        .environment(viewModel)
                     Spacer()
                 } else {
-//                    if viewModel.isMealsLoading {
-//                        CompactHomeView(meals: Meal.sampleMeals)
-//                            .environmentObject(viewModel)
-//                            .skeleton(isRedacted: true)
-//                        
-//                        ProgressView()
-//                    } else {
-//                        CompactHomeView(meals: viewModel.meals)
-//                            .environmentObject(viewModel)
-//                    }
-                    
                     CompactHomeView()
-                        .environment(viewModel)
                 }
             }
+            .environment(viewModel)
             .task(id: scenePhase) {
                 guard scenePhase == .active else { return }
                 await refresh()
@@ -89,16 +68,34 @@ struct HomeView: View {
         var body: some View {
             List {
                 if #unavailable(iOS 26.0) {
-                    Text(viewModel.currentDateAsString())
-                        .foregroundStyle(.secondary)
-                        .listRowSeparator(.hidden)
+                    Section {
+                        Text(viewModel.currentDateAsString())
+                            .foregroundStyle(.secondary)
+                            .listSectionSeparator(.hidden)
+                    }
                 }
                 
                 if let announcement = viewModel.announcement, !announcement.isEmpty {
-                    AnnouncementBanner(text: announcement)
-                        .listRowSeparator(.hidden)
+                    Section {
+                        AnnouncementBanner(text: announcement)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                            .listSectionSeparator(.hidden)
+                    }
                 }
                 
+                if let schedule = viewModel.schedule {
+                    Section("학사 일정") {
+                        Text(schedule)
+                            .contextMenu {
+                                Button {
+                                    UIPasteboard.general.string = schedule
+                                } label: {
+                                    Label("복사", systemImage: "document.on.document")
+                                }
+                                ShareLink(item: schedule)
+                            }
+                    }
+                }
                 ForEach(viewModel.meals, id: \.mealKind.rawValue) { meal in
                     Section {
                         if let menus = meal.menus, !menus.isEmpty {
@@ -134,10 +131,9 @@ struct HomeView: View {
                             }
                         }
                     }
-                }  
+                }
             }
-            .listStyle(.plain)
-        }
+            .listStyle(.plain)        }
     }
     
     private struct RegularHomeView: View {
@@ -154,108 +150,84 @@ struct HomeView: View {
                     Text(viewModel.currentDateAsString())
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
                 }
                 
                 if let announcement = viewModel.announcement, !announcement.isEmpty {
                     AnnouncementBanner(text: announcement)
-                        .padding(.bottom)
+                        .padding(.horizontal)
                 }
                 
-//                HStack {
-                HStack(alignment: .top) {
-                    ForEach(viewModel.meals, id: \.mealKind.rawValue) { meal in
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text(meal.mealKind.displayName)
-                                if let calorie = meal.calorieInfo {
-                                    Spacer()
-                                    Text(calorie)
-                                }
-                            }
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .padding(.bottom)
-                            
-                            if let menus = meal.menus, !menus.isEmpty {
-                                VStack(alignment: .leading) {
-                                    ForEach(menus, id: \.self) { menu in
-                                        if let list = menu.allergies, !list.isDisjoint(with: selectedAllergies) {
-                                            Text(menu.name)
-                                                .foregroundStyle(.red)
-                                        } else {
-                                            Text(menu.name)
+                HStack {
+                    if let schedule = viewModel.schedule {
+                        List {
+                            Section("학사 일정") {
+                                Text(schedule)
+                                    .listSectionSeparator(.hidden)
+                                    .contextMenu {
+                                        Button {
+                                            UIPasteboard.general.string = schedule
+                                        } label: {
+                                            Label("복사", systemImage: "document.on.document")
                                         }
+                                        ShareLink(item: schedule)
                                     }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
-                                .contextMenu {
-                                    let menuNames = menus.compactMap({ $0.name })
-                                    
-                                    Button {
-                                        UIPasteboard.general.strings = menuNames
-                                    } label: {
-                                        Label("복사", systemImage: "document.on.document")
-                                    }
-                                    ShareLink(item: menuNames.joined(separator: "\n"))
-                                }
-                            } else {
-                                Text("급식 정보가 없습니다.")
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .scrollDisabled(true)
+                        .listStyle(.plain)
+                        .contentMargins(0)
                         
-//                        List {
-//                            Section {
-//                                if let menus = meal.menus, !menus.isEmpty {
-//                                    VStack(alignment: .leading) {
-//                                        ForEach(menus, id: \.self) { menu in
-//                                            if let list = menu.allergies, !list.isDisjoint(with: selectedAllergies) {
-//                                                Text(menu.name)
-//                                                    .foregroundStyle(.red)
-//                                            } else {
-//                                                Text(menu.name)
-//                                            }
-//                                        }
-//                                    }
-//                                    .contextMenu {
-//                                        let menuNames = menus.compactMap({ $0.name })
-//                                        
-//                                        Button {
-//                                            UIPasteboard.general.strings = menuNames
-//                                        } label: {
-//                                            Label("복사", systemImage: "document.on.document")
-//                                        }
-//                                        ShareLink(item: menuNames.joined(separator: "\n"))
-//                                    }
-//                                } else {
-//                                    Text("급식 정보가 없습니다.")
-//                                }
-//                            } header: {
-//                                HStack {
-//                                    Text(meal.mealKind.displayName)
-//                                    if let calorie = meal.calorieInfo {
-//                                        Spacer()
-//                                        Text(calorie)
-//                                    }
-//                                }
-//                            }
-//                            .listSectionSeparator(.hidden)
-//                        }
-//                        .scrollDisabled(true)
-//                        .listStyle(.plain)
-//                        .contentMargins(0)
-//                        .listRowSpacing(0)
-//                        .listSectionSpacing(.zero)
+                        Divider()
+                    }
+                    ForEach(viewModel.meals, id: \.mealKind.rawValue) { meal in
+                        List {
+                            Section {
+                                if let menus = meal.menus, !menus.isEmpty {
+                                    VStack(alignment: .leading) {
+                                        ForEach(menus, id: \.self) { menu in
+                                            if let list = menu.allergies, !list.isDisjoint(with: selectedAllergies) {
+                                                Text(menu.name)
+                                                    .foregroundStyle(.red)
+                                            } else {
+                                                Text(menu.name)
+                                            }
+                                        }
+                                    }
+                                    .contextMenu {
+                                        let menuNames = menus.compactMap({ $0.name })
+                                        
+                                        Button {
+                                            UIPasteboard.general.strings = menuNames
+                                        } label: {
+                                            Label("복사", systemImage: "document.on.document")
+                                        }
+                                        ShareLink(item: menuNames.joined(separator: "\n"))
+                                    }
+                                } else {
+                                    Text("급식 정보가 없습니다.")
+                                }
+                            } header: {
+                                HStack {
+                                    Text(meal.mealKind.displayName)
+                                    if let calorie = meal.calorieInfo {
+                                        Spacer()
+                                        Text(calorie)
+                                    }
+                                }
+                            }
+                            .listSectionSeparator(.hidden)
+                        }
+                        .scrollDisabled(true)
+                        .listStyle(.plain)
+                        .contentMargins(0)
                         
                         if meal.mealKind.rawValue != "3" {
                             Divider()
-                                .padding(.horizontal)
                         }
                     }
                 }
             }
-            .scenePadding()
         }
     }
 }

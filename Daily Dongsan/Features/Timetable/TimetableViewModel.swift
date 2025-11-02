@@ -26,6 +26,29 @@ class TimetableViewModel {
     
     var lastSubjects: [Subject] = []
     
+    // Builds a complete 5x8 grid by filling missing day/period slots from a template
+    private static func completedBase(from entries: [TimetableEntry]) -> [TimetableEntry] {
+        // Use sampleTimetable as the template for all slots
+        let template = TimetableEntry.sampleTimetable.compactMap { base in
+            TimetableEntry(day: base.day, period: base.period, subject: "")
+        }
+        // Create a lookup from incoming entries
+        var lookup: [String: TimetableEntry] = [:]
+        for e in entries {
+            let key = "\(e.day.rawValue)-\(e.period)"
+            lookup[key] = e
+        }
+        // For each slot in template, replace with incoming subject if available
+        return template.map { slot in
+            let key = "\(slot.day.rawValue)-\(slot.period)"
+            if let incoming = lookup[key] {
+                return TimetableEntry(day: slot.day, period: slot.period, subject: incoming.subject)
+            } else {
+                return slot
+            }
+        }
+    }
+    
     var selectedGrade: Int {
         get {
             access(keyPath: \.selectedGrade)
@@ -182,7 +205,8 @@ class TimetableViewModel {
     
     @MainActor
     private func updateEntries(_ entries: [TimetableEntry]) {
-        self.baseEntries = entries
+        // Ensure baseEntries always contains a full grid so overlay selections can apply to empty cells
+        self.baseEntries = Self.completedBase(from: entries)
         self.rebuildEntries()
     }
 }

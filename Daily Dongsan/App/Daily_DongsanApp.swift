@@ -20,7 +20,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct Daily_DongsanApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    @AppStorage("showOnboardingView") private var showOnboardingView = true
+//    @AppStorage("showOnboardingView") private var showOnboardingView = true
     
     @State private var networkMonitor = NetworkMonitor()
     
@@ -34,10 +34,10 @@ struct Daily_DongsanApp: App {
                 ContentView()
                     .modelContainer(for: Subject.self)
             }
-            .sheet(isPresented: $showOnboardingView) {
-                OnboardingView()
-                    .interactiveDismissDisabled()
-            }
+//            .sheet(isPresented: $showOnboardingView) {
+//                OnboardingView()
+//                    .interactiveDismissDisabled()
+//            }
             .animation(.default, value: networkMonitor.isConnected)
         }
     }

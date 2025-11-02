@@ -23,7 +23,7 @@ struct FeedbackShareView: View {
                 }
             }
         }
-        .navigationTitle("피드백 공유")
+        .navigationTitle("피드백")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -58,7 +58,8 @@ struct StudentIDSetupView: View {
                     .foregroundStyle(.secondary)
                 
                 Spacer()
-                
+            }
+            .safeAreaInset(edge: .bottom) {
                 Button {
                     commit()
                 } label: {

@@ -7,7 +7,7 @@
 
 import FirebaseFirestore
 
-struct Mealresponse: Codable {
+struct MealResponse: Codable {
     let mealServiceDietInfo: [MealServiceDietInfo]
 }
 
@@ -106,7 +106,7 @@ class FetchMeals {
             let (data, _) = try await URLSession.shared.data(from: url)
             
             let decoder = JSONDecoder()
-            let response = try decoder.decode(Mealresponse.self, from: data)
+            let response = try decoder.decode(MealResponse.self, from: data)
             
             if let rows = response.mealServiceDietInfo[1].row {
                 if let row = rows.first(where: { $0.MMEAL_SC_CODE == "2" }) {

@@ -27,12 +27,6 @@ struct MoreView: View {
         NavigationStack {
             List {
                 Section {
-                    Button("데일리 동산을 물려받을 후배를 찾아요.\nDM: @j12han") {
-                        UIApplication.shared.open(URL(string: "https://www.instagram.com/j12han/")!)
-                    }
-                }
-                
-                Section {
                     NavigationLink {
                         NotificationSettingsView()
                             .environment(notificationSettingsViewModel)
@@ -64,7 +58,6 @@ struct MoreView: View {
                         LabeledContent("알레르기 유발 식품 선택") {
                             if !allergySelectionViewModel.selectedAllergies.isEmpty {
                                 Text("\(allergySelectionViewModel.selectedAllergies.count)개")
-                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -94,16 +87,12 @@ struct MoreView: View {
                 //                }
                 
                 Section {
-                    NavigationLink("피드백 공유") {
+                    NavigationLink("피드백") {
                         FeedbackShareView()
                     }
                 } footer: {
                     Text("버전: " + String(describing: appVersion))
                 }
-                
-                //                Button("워치 업데이트") {
-                //                    WatchConnector().session.sendMessage(["message" : "메시지 보냄"], replyHandler: nil)
-                //                }
             }
             .navigationTitle("더보기")
         }

@@ -26,6 +26,7 @@ class HomeViewModel {
     var isMealsLoading: Bool = false
     
     var announcement: String?
+    var schedule: String?
     var meals: [Meal] = []
     
     private enum DateChangeReason {
@@ -75,19 +76,25 @@ class HomeViewModel {
         }
     }
     
-    func fetchMeals() async {
+    func fetchScheduleAndMeals() async {
         await MainActor.run {
             withAnimation {
                 isMealsLoading = true
             }
         }
-        
+
         let target = computeTargetDate().date
-        let fetched = await FetchMeals().fetchMeals(for: target)
-        
+
+        async let scheduleTask = FetchSchedules().fetchSchedules(for: target)
+        async let mealsTask = FetchMeals().fetchMeals(for: target)
+
+        let scheduleResult = await scheduleTask
+        let mealsResult = await mealsTask
+
         await MainActor.run {
             withAnimation {
-                meals = fetched
+                schedule = scheduleResult
+                meals = mealsResult
                 isMealsLoading = false
             }
         }
@@ -107,3 +114,4 @@ class HomeViewModel {
         }
     }
 }
+
